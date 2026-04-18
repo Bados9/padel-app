@@ -58,7 +58,7 @@ padel-app/
 ## Plán implementace (milníky)
 
 - **M0** – Bootstrap _(hotovo)_
-- **M1** – DB schema + Auth (email/heslo)
+- **M1** – DB schema + Auth (email/heslo) _(hotovo)_
 - **M2** – Core booking (kurty, kalendář, rezervace, moje rezervace)
 - **M3** – Matchmaking (veřejné rezervace + level)
 - **M4** – Admin UI (dashboard, CRUD kurtů, uživatelé)

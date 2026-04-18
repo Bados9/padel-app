@@ -15,13 +15,16 @@ export async function TopBar() {
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/rezervace" className="hover:underline">Rezervace</Link>
           <Link href="/hry" className="hover:underline">Otevřené hry</Link>
+          {session?.user ? (
+            <Link href="/moje-rezervace" className="hover:underline">Moje</Link>
+          ) : null}
           {session?.user?.role === "ADMIN" ? (
             <Link href="/admin" className="hover:underline">Admin</Link>
           ) : null}
 
           {session?.user ? (
             <div className="flex items-center gap-2">
-              <Link href="/profil" className="text-muted-foreground hover:underline">
+              <Link href="/moje-rezervace" className="text-muted-foreground hover:underline">
                 {session.user.name}
               </Link>
               <form

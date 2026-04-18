@@ -10,8 +10,9 @@ export default auth((req) => {
   const isAdmin = req.auth?.user?.role === "ADMIN";
 
   // Cesty v rámci "chráněné" zóny uživatele
+  // /rezervace (katalog + detail kurtu) jsou VEŘEJNÉ; samotný server action
+  // createReservation si auth kontroluje sám.
   const userProtected =
-    pathname.startsWith(`${basePath}/rezervace`) ||
     pathname.startsWith(`${basePath}/profil`) ||
     pathname.startsWith(`${basePath}/moje`);
 
