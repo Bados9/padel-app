@@ -61,29 +61,10 @@ export default async function CourtsPage() {
               <Link
                 key={c.id}
                 href={`/rezervace/${c.id}`}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-surface-raised shadow-sm transition hover:shadow-md hover:-translate-y-0.5"
+                className="group relative rounded-2xl border border-border bg-surface-raised p-5 space-y-4 shadow-sm transition hover:shadow-md hover:-translate-y-0.5"
               >
-                {/* Hero band s court pattern */}
-                <div className="relative h-24 bg-gradient-to-br from-primary/20 via-primary/5 to-accent/30">
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-[url('/patterns/court-mini.svg')] bg-center bg-no-repeat opacity-40 text-primary"
-                  />
-                  <div className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-surface-raised/90 px-2.5 py-1 text-[11px] font-medium backdrop-blur-sm">
-                    {c.indoor ? (
-                      <>
-                        <Home className="size-3" /> Krytý
-                      </>
-                    ) : (
-                      <>
-                        <Sun className="size-3" /> Venkovní
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-5 space-y-4">
-                  <div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
                     <h2 className="text-h3 group-hover:text-primary transition-colors">
                       {c.name}
                     </h2>
@@ -93,32 +74,43 @@ export default async function CourtsPage() {
                       </p>
                     ) : null}
                   </div>
-
-                  <div className="flex flex-wrap gap-1.5">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
-                      <Layers className="size-3" />
-                      {SURFACE_LABEL[c.surface]}
-                    </span>
-                    {todaysOpening ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted tnum">
-                        <Clock className="size-3" />
-                        dnes {todaysOpening.startTime}–{todaysOpening.endTime}
-                      </span>
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-surface-sunken px-2.5 py-1 text-[11px] font-medium text-foreground-muted">
+                    {c.indoor ? (
+                      <>
+                        <Home className="size-3" /> Krytý
+                      </>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
-                        <Clock className="size-3" />
-                        dnes zavřeno
-                      </span>
+                      <>
+                        <Sun className="size-3" /> Venkovní
+                      </>
                     )}
-                  </div>
+                  </span>
+                </div>
 
-                  <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-foreground-subtle">
-                    <span className="truncate">{summary ?? "Otevřeno podle rozpisu"}</span>
-                    <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground group-hover:text-primary transition-colors shrink-0">
-                      Dostupnost
-                      <ArrowRight className="size-3.5 transition group-hover:translate-x-0.5" />
+                <div className="flex flex-wrap gap-1.5">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
+                    <Layers className="size-3" />
+                    {SURFACE_LABEL[c.surface]}
+                  </span>
+                  {todaysOpening ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted tnum">
+                      <Clock className="size-3" />
+                      dnes {todaysOpening.startTime}–{todaysOpening.endTime}
                     </span>
-                  </div>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
+                      <Clock className="size-3" />
+                      dnes zavřeno
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-foreground-subtle">
+                  <span className="truncate">{summary ?? "Otevřeno podle rozpisu"}</span>
+                  <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground group-hover:text-primary transition-colors shrink-0">
+                    Dostupnost
+                    <ArrowRight className="size-3.5 transition group-hover:translate-x-0.5" />
+                  </span>
                 </div>
               </Link>
             );

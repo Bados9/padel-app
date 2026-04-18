@@ -60,6 +60,7 @@ Tenhle dokument je **živý seznam** všeho, co vědomě zjednodušujeme / vynec
 
 ## UI / UX
 
+- [ ] **Fotky / ilustrace kurtů** na stránce „Vyber si kurt" (`/rezervace`) – teď jsou karty jen textové. Až bude reálný obsah (foto kurtu z klubu), vrátit hero band s obrázkem nebo galerii; v prototypu úmyslně vypnuto kvůli přehlednosti.
 - [ ] **i18n – EN / další jazyky** – nasazeno pouze CS přes next-intl
 - [ ] **Dark mode preferencia uživatele** – jen system default
 - [ ] **PWA / offline** – ne
