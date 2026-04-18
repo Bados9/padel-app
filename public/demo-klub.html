@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SK Padel Jihlava – ukázkový web klubu</title>
+  <style>
+    :root {
+      --bg: #fef9f2;
+      --ink: #2d2416;
+      --ink-muted: #665a47;
+      --brand: #c4411f;
+      --brand-ink: #fff;
+      --line: #e8dfce;
+      --card: #fff;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    /* Záměrně jinou typografií a paletou, ať je vidět, že iframe je jiný widget */
+    a { color: var(--brand); }
+    header {
+      border-bottom: 1px solid var(--line);
+      background: var(--card);
+    }
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    header .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.01em;
+    }
+    .logo span { color: var(--brand); }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+      margin: 0;
+      padding: 0;
+      font-size: 15px;
+    }
+    nav a { text-decoration: none; color: var(--ink-muted); }
+    nav a:hover { color: var(--ink); }
+    nav a.active { color: var(--ink); font-weight: 600; }
+
+    .hero {
+      padding: 80px 0 48px;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.1;
+      margin: 0 0 16px;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.01em;
+    }
+    .hero p {
+      max-width: 680px;
+      color: var(--ink-muted);
+      font-size: 18px;
+      margin: 0 0 24px;
+    }
+    .ribbon {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--brand);
+      color: var(--brand-ink);
+      font-size: 13px;
+      font-family: Verdana, sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    section.about {
+      padding: 48px 0;
+      display: grid;
+      gap: 32px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 760px) {
+      section.about { grid-template-columns: 1fr 1fr; }
+    }
+    section.about h2 {
+      font-size: 28px;
+      margin: 0 0 12px;
+      font-style: italic;
+      font-weight: 400;
+    }
+    section.about p {
+      color: var(--ink-muted);
+      margin: 0 0 12px;
+    }
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 24px;
+    }
+    .info-card h3 {
+      font-size: 16px;
+      margin: 0 0 8px;
+      font-weight: 700;
+      font-family: Verdana, sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+    .info-card p {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    section.reservation {
+      padding: 32px 0 72px;
+    }
+    section.reservation .intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    section.reservation h2 {
+      font-size: 32px;
+      margin: 0;
+      font-style: italic;
+      font-weight: 400;
+    }
+    section.reservation .hint {
+      font-size: 14px;
+      color: var(--ink-muted);
+    }
+    section.reservation .hint code {
+      background: var(--card);
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .iframe-frame {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      padding: 0;
+      overflow: hidden;
+    }
+    iframe#padel {
+      width: 100%;
+      border: 0;
+      display: block;
+      min-height: 400px;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 24px 0;
+      font-size: 13px;
+      color: var(--ink-muted);
+      background: var(--card);
+    }
+    footer .wrap {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge-note {
+      background: #fff8e7;
+      border: 1px dashed #c9a94f;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #6b5a1d;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="logo">SK <span>Padel</span> Jihlava</div>
+      <nav>
+        <ul>
+          <li><a href="#">O klubu</a></li>
+          <li><a href="#">Trenéři</a></li>
+          <li><a href="#" class="active">Rezervace</a></li>
+          <li><a href="#">Kontakt</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="ribbon">Od roku 1998</div>
+      <h1>Padelový klub<br>ve stínu bříz</h1>
+      <p>Dva krytý kurty, letní posezení, přátelská atmosféra a pravidelné víkendové turnaje pro hráče všech úrovní.</p>
+    </div>
+  </section>
+
+  <section class="about">
+    <div class="wrap" style="display: contents;">
+      <div>
+        <h2>Krátce o nás</h2>
+        <p>Nejstarší padelový klub na Vysočině. Hrajeme, trénujeme a pořádáme turnaje už čtvrt století. Nabízíme individuální lekce s certifikovanými trenéry, víkendové kempy pro začátečníky i vyšší úrovně.</p>
+        <p>V novém areálu najdete i kavárnu, dětský koutek a parkoviště u vchodu.</p>
+      </div>
+      <div>
+        <div class="info-card">
+          <h3>Otevírací doba</h3>
+          <p>Pondělí–Neděle · 8:00–22:00</p>
+        </div>
+        <div class="info-card" style="margin-top: 12px;">
+          <h3>Kde nás najdete</h3>
+          <p>Lesní 42, Jihlava<br>GPS: 49.3961, 15.5912</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reservation">
+    <div class="wrap">
+      <div class="intro">
+        <h2>Rezervujte si termín</h2>
+        <span class="hint">
+          Rezervační systém pohání <code>Padel.klub</code>
+        </span>
+      </div>
+
+      <div class="badge-note">
+        <strong>Demo:</strong> iframe níž vkládá rezervační kalendář z
+        <code>http://localhost:3100/embed</code>. Výška se mění automaticky
+        přes <code>postMessage</code> – kliknutí na „Rezervovat" u konkrétního
+        kurtu otevře detail v hlavním okně.
+      </div>
+
+      <div class="iframe-frame">
+        <iframe
+          id="padel"
+          src="/embed"
+          title="Rezervace padelových kurtů"
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span>© 1998–2026 SK Padel Jihlava · IČ: 00000000</span>
+      <span>Made with ❤ · Demo webu pro ukázku integrace rezervací</span>
+    </div>
+  </footer>
+
+  <script>
+    // Poslech postMessage z iframu a přenastavení výšky.
+    (function () {
+      var iframe = document.getElementById('padel');
+      window.addEventListener('message', function (e) {
+        if (!e.data || e.data.type !== 'padel-resize') return;
+        if (typeof e.data.height === 'number' && iframe) {
+          iframe.style.height = e.data.height + 'px';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
