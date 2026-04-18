@@ -4,6 +4,7 @@ import { formatDateTimeCZ, formatTimeCZ } from "@/lib/time";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CancelButton } from "@/components/reservations/cancel-button";
+import { STATUS_LABEL, VISIBILITY_LABEL } from "@/lib/labels";
 
 export const metadata = { title: "Admin – Rezervace" };
 
@@ -70,10 +71,10 @@ export default async function AdminReservationsPage({ searchParams }: PageProps)
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium">{r.court.name}</span>
                     <Badge variant="secondary" className="text-[10px]">
-                      {r.status}
+                      {STATUS_LABEL[r.status]}
                     </Badge>
                     <Badge variant="outline" className="text-[10px]">
-                      {r.visibility}
+                      {VISIBILITY_LABEL[r.visibility]}
                     </Badge>
                     {r.visibility === "PUBLIC" ? (
                       <Badge variant="outline" className="text-[10px]">

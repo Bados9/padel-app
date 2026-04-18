@@ -1,4 +1,10 @@
-import type { PlayerLevel, CourtSurface } from "@prisma/client";
+import type {
+  PlayerLevel,
+  CourtSurface,
+  UserRole,
+  ReservationStatus,
+  ReservationVisibility,
+} from "@prisma/client";
 
 export const LEVEL_LABEL: Record<PlayerLevel, string> = {
   BEGINNER: "Začátečník",
@@ -20,9 +26,19 @@ export const SURFACE_LABEL: Record<CourtSurface, string> = {
   CONCRETE: "Beton",
 };
 
-export const VISIBILITY_LABEL: Record<"PRIVATE" | "PUBLIC", string> = {
+export const VISIBILITY_LABEL: Record<ReservationVisibility, string> = {
   PRIVATE: "Soukromá",
   PUBLIC: "Otevřená",
+};
+
+export const STATUS_LABEL: Record<ReservationStatus, string> = {
+  CONFIRMED: "Potvrzená",
+  CANCELLED: "Zrušená",
+};
+
+export const ROLE_LABEL: Record<UserRole, string> = {
+  USER: "Hráč",
+  ADMIN: "Administrátor",
 };
 
 // Plurál: [1, 2-4, 5+]

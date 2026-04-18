@@ -3,14 +3,9 @@ import { db } from "@/lib/db";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { SURFACE_LABEL } from "@/lib/labels";
 
 export const metadata = { title: "Admin – Kurty" };
-
-const SURFACE_LABEL: Record<string, string> = {
-  ARTIFICIAL_GRASS: "Umělá tráva",
-  CARPET: "Koberec",
-  CONCRETE: "Beton",
-};
 
 export default async function AdminCourtsPage() {
   const courts = await db.court.findMany({
@@ -63,7 +58,7 @@ export default async function AdminCourtsPage() {
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {SURFACE_LABEL[c.surface] ?? c.surface} · {c._count.reservations} rezervací · {c._count.openingHours} otevřených dnů
+                    {SURFACE_LABEL[c.surface]} · {c._count.reservations} rezervací · {c._count.openingHours} otevřených dnů
                   </p>
                 </div>
                 <Link
