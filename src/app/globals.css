@@ -208,6 +208,7 @@
   /* Tabular numerals pro časy, čísla v listech */
   .tnum {
     font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "cv11" 1;
   }
 
   /* Focus ring default – zdědí rounded od cíle, takže nenaruší velké karty */

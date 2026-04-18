@@ -254,7 +254,7 @@ export function ReservationPicker({
                   {isOpen ? "Vyber si začátek" : "Kurt je zavřený"}
                 </h2>
               </div>
-              <div className="text-xs text-foreground-muted font-mono tnum">
+              <div className="text-xs text-foreground-muted tnum">
                 {isOpen && openingLabel ? `otevřeno ${openingLabel}` : null}
               </div>
             </div>
@@ -301,7 +301,7 @@ export function ReservationPicker({
 
             {selectedStart && selectedRange ? (
               <div className="space-y-1.5">
-                <div className="font-mono tnum text-[28px] font-bold tracking-tight leading-none">
+                <div className="tnum text-[28px] font-bold tracking-tight leading-none">
                   {selectedStart}
                   <span className="text-foreground-subtle mx-1">–</span>
                   {minToLabel(selectedRange.endMin)}
@@ -510,7 +510,7 @@ export function ReservationPicker({
             <div className="min-w-0 flex-1">
               {selectedStart && selectedRange ? (
                 <>
-                  <div className="truncate font-mono tnum text-sm font-semibold">
+                  <div className="truncate tnum text-sm font-semibold">
                     {selectedStart}–{minToLabel(selectedRange.endMin)}
                   </div>
                   <div className="truncate text-[11px] text-foreground-subtle">
@@ -597,7 +597,7 @@ function SlotGridInteractive({
 
         const content = (
           <>
-            <span className="font-mono tnum text-[13px] font-semibold leading-none">
+            <span className="tnum text-[13px] font-semibold leading-none">
               {s.startLabel}
             </span>
             <span

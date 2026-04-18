@@ -103,7 +103,7 @@ export default async function GamesListPage({ searchParams }: PageProps) {
               >
                 {/* Time column */}
                 <div className="flex sm:flex-col sm:items-center sm:justify-center gap-2 sm:min-w-[110px]">
-                  <div className="font-mono tnum text-lg font-bold leading-none">
+                  <div className="tnum text-lg font-bold leading-none">
                     {formatTimeCZ(g.startAt)}
                   </div>
                   <div className="text-xs text-foreground-subtle sm:text-center">
@@ -116,7 +116,7 @@ export default async function GamesListPage({ searchParams }: PageProps) {
                 <div className="space-y-1 sm:border-l sm:border-border sm:pl-4">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold">{g.court.name}</span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-foreground-muted font-mono tnum">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-foreground-muted tnum">
                       {totalPlayers}/4
                     </span>
                     {g.preferredLevel ? (

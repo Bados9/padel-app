@@ -100,7 +100,7 @@ export default async function CourtsPage() {
                       {SURFACE_LABEL[c.surface]}
                     </span>
                     {todaysOpening ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted font-mono tnum">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted tnum">
                         <Clock className="size-3" />
                         dnes {todaysOpening.startTime}–{todaysOpening.endTime}
                       </span>

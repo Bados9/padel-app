@@ -156,7 +156,7 @@ export default async function MyReservationsPage({ searchParams }: PageProps) {
                       {r.status === "CANCELLED" ? "zrušeno" : "odehráno"}
                     </span>
                   </div>
-                  <p className="text-xs text-foreground-subtle font-mono tnum">
+                  <p className="text-xs text-foreground-subtle tnum">
                     {formatDateCZ(r.startAt)} · {formatTimeCZ(r.startAt)}–
                     {formatTimeCZ(r.endAt)}
                   </p>
@@ -201,7 +201,7 @@ function NextReservationCard({
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="space-y-1">
             <div className="text-caption text-primary">Nejbližší</div>
-            <div className="font-mono tnum text-h1 text-foreground leading-none">
+            <div className="tnum text-h1 text-foreground leading-none">
               {formatTimeCZ(r.startAt)}
               <span className="text-foreground-muted mx-1">–</span>
               {formatTimeCZ(r.endAt)}
@@ -292,7 +292,7 @@ function ReservationRow({
             </span>
           ) : null}
         </div>
-        <p className="text-sm font-mono tnum">
+        <p className="text-sm tnum">
           {formatDateCZ(r.startAt)} · {formatTimeCZ(r.startAt)}–
           {formatTimeCZ(r.endAt)}
         </p>

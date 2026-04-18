@@ -66,7 +66,7 @@ export default async function GameDetailPage({ params }: PageProps) {
         />
         <div className="relative space-y-3">
           <div className="text-caption text-primary">Otevřená hra</div>
-          <div className="font-mono tnum text-h1 leading-none">
+          <div className="tnum text-h1 leading-none">
             {formatTimeCZ(game.startAt)}
             <span className="text-foreground-muted mx-1">–</span>
             {formatTimeCZ(game.endAt)}
@@ -161,9 +161,14 @@ export default async function GameDetailPage({ params }: PageProps) {
               .
             </p>
           ) : isGuest ? (
-            <JoinLeaveButton reservationId={game.id} mode="leave" />
+            <JoinLeaveButton
+              key={`leave-${game.id}`}
+              reservationId={game.id}
+              mode="leave"
+            />
           ) : (
             <JoinLeaveButton
+              key={`join-${game.id}`}
               reservationId={game.id}
               mode="join"
               disabled={freeSpots === 0}

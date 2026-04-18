@@ -123,7 +123,7 @@ export default async function Home() {
         {!session ? (
           <p className="text-xs text-foreground-subtle pt-3">
             Testovací účet:{" "}
-            <code className="px-1.5 py-0.5 rounded-md bg-surface-sunken text-foreground font-mono tnum">
+            <code className="px-1.5 py-0.5 rounded-md bg-surface-sunken text-foreground tnum">
               hrac@padel.local / hrac123
             </code>
           </p>
@@ -166,7 +166,7 @@ export default async function Home() {
                     className="group flex items-center justify-between rounded-lg border border-border px-3 py-2 hover:border-primary hover:bg-primary-soft hover:text-primary transition"
                   >
                     <span className="flex items-center gap-2">
-                      <span className="font-mono tnum text-sm font-semibold">
+                      <span className="tnum text-sm font-semibold">
                         {s.time}
                       </span>
                       <span className="text-sm text-foreground-muted group-hover:text-primary">
@@ -213,7 +213,7 @@ export default async function Home() {
                       className="group flex items-center justify-between rounded-lg border border-border px-3 py-2 hover:border-primary hover:bg-primary-soft hover:text-primary transition"
                     >
                       <span className="flex items-center gap-2">
-                        <span className="font-mono tnum text-sm font-semibold">
+                        <span className="tnum text-sm font-semibold">
                           {formatTimeCZ(g.startAt)}
                         </span>
                         <span className="text-sm text-foreground-muted group-hover:text-primary">
