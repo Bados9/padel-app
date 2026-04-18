@@ -25,12 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="cs">
-      <body
-        className={`${inter.variable} ${jetbrains.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="cs" className={`${inter.variable} ${jetbrains.variable}`}>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
