@@ -1,24 +1,29 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  ArrowLeft,
+  CircleCheck,
+  Home,
+  Layers,
+  Sun,
+} from "lucide-react";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import {
   clubDayOfWeek,
   formatDateCZ,
+  formatTimeCZ,
   generateDaySlots,
   shiftDate,
   todayInClubTz,
 } from "@/lib/time";
 import { MAX_DAYS_AHEAD } from "@/lib/club";
-import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SlotGrid, type SlotState } from "@/components/reservations/slot-grid";
+import { SURFACE_LABEL } from "@/lib/labels";
 import {
-  ReservationForm,
-  type FreeSlot,
-} from "@/components/reservations/reservation-form";
+  ReservationPicker,
+  type PickerSlot,
+  type SlotState,
+} from "@/components/reservations/reservation-picker";
 
 type PageProps = {
   params: Promise<{ courtId: string }>;
@@ -52,18 +57,18 @@ export default async function CourtDetailPage({
 
   const dow = clubDayOfWeek(date);
   const opening = court.openingHours.find((o) => o.dayOfWeek === dow);
+  const isOpen = !!opening;
 
   const session = await auth();
   const viewerId = session?.user?.id ?? null;
 
-  const slots = opening ? generateDaySlots(date, opening) : [];
+  // Generuj sloty + jejich stavy
+  const daySlots = opening ? generateDaySlots(date, opening) : [];
+  let pickerSlots: PickerSlot[] = [];
 
-  let states: SlotState[] = [];
-  let freeSlots: FreeSlot[] = [];
-
-  if (slots.length > 0) {
-    const dayStart = slots[0].startAt;
-    const dayEnd = slots[slots.length - 1].endAt;
+  if (daySlots.length > 0) {
+    const dayStart = daySlots[0].startAt;
+    const dayEnd = daySlots[daySlots.length - 1].endAt;
 
     const reservations = await db.reservation.findMany({
       where: {
@@ -76,25 +81,54 @@ export default async function CourtDetailPage({
     });
 
     const now = Date.now();
-    states = slots.map((s) => {
-      if (s.endAt.getTime() <= now) return "past";
-      const overlap = reservations.find(
-        (r) => r.startAt < s.endAt && r.endAt > s.startAt,
-      );
-      if (overlap) {
-        return viewerId && overlap.ownerId === viewerId ? "own" : "reserved";
+    pickerSlots = daySlots.map((s) => {
+      let state: SlotState = "free";
+      if (s.endAt.getTime() <= now) {
+        state = "past";
+      } else {
+        const overlap = reservations.find(
+          (r) => r.startAt < s.endAt && r.endAt > s.startAt,
+        );
+        if (overlap) {
+          state = viewerId && overlap.ownerId === viewerId ? "own" : "reserved";
+        }
       }
-      return "free";
+      return {
+        startLabel: s.startLabel,
+        endLabel: s.endLabel,
+        state,
+      };
     });
+  }
 
-    freeSlots = slots
-      .map((s, i) => ({ slot: s, state: states[i] }))
-      .filter((x) => x.state === "free")
-      .map((x) => ({
-        startLabel: x.slot.startLabel,
-        endLabel: x.slot.endLabel,
-        minutes: 30,
-      }));
+  // Week strip: 7 dnů kolem "date"; střed je aktuálně zobrazovaný den, ale
+  // klidně mohou být dny v minulosti/budoucnosti – disable podle today/maxDate.
+  const weekStripStart = shiftDate(date, -3);
+  const weekStrip = Array.from({ length: 7 }).map((_, i) => {
+    const d = shiftDate(weekStripStart, i);
+    const jsDate = new Date(`${d}T12:00:00Z`);
+    return {
+      date: d,
+      dayName: DAY_NAMES[clubDayOfWeek(d)],
+      dayNum: jsDate.getUTCDate().toString(),
+      isToday: d === today,
+      isCurrent: d === date,
+      isDisabled: d < today || d > maxDate,
+    };
+  });
+
+  // Nejbližší otevřený den v případě, že je kurt zavřený
+  let nextOpenDate: string | null = null;
+  if (!isOpen) {
+    for (let i = 1; i <= MAX_DAYS_AHEAD; i++) {
+      const candidate = shiftDate(date, i);
+      if (candidate > maxDate) break;
+      const cDow = clubDayOfWeek(candidate);
+      if (court.openingHours.some((o) => o.dayOfWeek === cDow)) {
+        nextOpenDate = candidate;
+        break;
+      }
+    }
   }
 
   const prevDate = shiftDate(date, -1);
@@ -107,138 +141,84 @@ export default async function CourtDetailPage({
   )}`;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 space-y-8">
-      <div className="space-y-2">
+    <div className="mx-auto max-w-6xl px-4 py-10 space-y-6">
+      <div className="space-y-3">
         <Link
           href="/rezervace"
-          className="text-sm text-muted-foreground hover:underline"
+          className="inline-flex items-center gap-1 text-sm text-foreground-muted hover:text-foreground transition"
         >
-          ← Všechny kurty
+          <ArrowLeft className="size-3.5" />
+          Všechny kurty
         </Link>
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{court.name}</h1>
-            {court.description ? (
-              <p className="text-muted-foreground">{court.description}</p>
-            ) : null}
+
+        <div className="rounded-2xl border border-border bg-surface-raised p-5 shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div className="text-caption text-foreground-subtle">
+                Krok 2 z 2
+              </div>
+              <h1 className="text-h1 mt-1">{court.name}</h1>
+              {court.description ? (
+                <p className="text-sm text-foreground-muted mt-1 max-w-2xl">
+                  {court.description}
+                </p>
+              ) : null}
+              <div className="flex flex-wrap gap-1.5 pt-3">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
+                  {court.indoor ? (
+                    <>
+                      <Home className="size-3" /> Krytý
+                    </>
+                  ) : (
+                    <>
+                      <Sun className="size-3" /> Venkovní
+                    </>
+                  )}
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
+                  <Layers className="size-3" />
+                  {SURFACE_LABEL[court.surface]}
+                </span>
+              </div>
+            </div>
           </div>
-          <Badge variant="secondary">{court.indoor ? "Krytý" : "Venkovní"}</Badge>
         </div>
       </div>
 
       {sp.created ? (
-        <Alert>
-          <AlertTitle>Rezervace vytvořena</AlertTitle>
-          <AlertDescription>
+        <div className="flex items-start gap-3 rounded-2xl border border-success/30 bg-success-soft p-4 text-success">
+          <CircleCheck className="size-5 shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <div className="font-semibold">Rezervace vytvořena</div>
             Najdeš ji v{" "}
             <Link href="/moje-rezervace" className="underline">
               Moje rezervace
             </Link>
             .
-          </AlertDescription>
-        </Alert>
+          </div>
+        </div>
       ) : null}
 
-      <Card>
-        <CardContent className="pt-6 space-y-4">
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div>
-              <div className="text-xs uppercase text-muted-foreground">Den</div>
-              <div className="text-lg font-semibold">{formatDateCZ(date)}</div>
-              <div className="text-xs text-muted-foreground">
-                {DAY_NAMES[dow]}{" "}
-                {opening ? (
-                  <>
-                    · otevřeno {opening.startTime}–{opening.endTime}
-                  </>
-                ) : (
-                  "· zavřeno"
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {canGoPrev ? (
-                <Link
-                  href={`/rezervace/${courtId}?date=${prevDate}`}
-                  className={buttonVariants({ variant: "outline", size: "sm" })}
-                >
-                  ← Předchozí
-                </Link>
-              ) : (
-                <span
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "sm",
-                    className: "pointer-events-none opacity-40",
-                  })}
-                >
-                  ← Předchozí
-                </span>
-              )}
-              <Link
-                href={`/rezervace/${courtId}?date=${today}`}
-                className={buttonVariants({ variant: "outline", size: "sm" })}
-              >
-                Dnes
-              </Link>
-              {canGoNext ? (
-                <Link
-                  href={`/rezervace/${courtId}?date=${nextDate}`}
-                  className={buttonVariants({ variant: "outline", size: "sm" })}
-                >
-                  Další →
-                </Link>
-              ) : (
-                <span
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "sm",
-                    className: "pointer-events-none opacity-40",
-                  })}
-                >
-                  Další →
-                </span>
-              )}
-            </div>
-          </div>
-
-          {opening ? (
-            <SlotGrid slots={slots} states={states} />
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Kurt je v tento den zavřený.
-            </p>
-          )}
-
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <LegendDot className="bg-emerald-500/60" /> volné
-            <LegendDot className="bg-red-500/60" /> obsazeno
-            <LegendDot className="bg-sky-500/60" /> vaše
-            <LegendDot className="bg-muted" /> uplynulé
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="pt-6 space-y-4">
-          <h2 className="text-lg font-semibold">Nová rezervace</h2>
-          <ReservationForm
-            courtId={courtId}
-            date={date}
-            freeSlots={freeSlots}
-            isAuthed={!!viewerId}
-            loginHref={loginHref}
-          />
-        </CardContent>
-      </Card>
+      <ReservationPicker
+        courtId={courtId}
+        courtName={court.name}
+        date={date}
+        dateLabel={formatDateCZ(date)}
+        dayName={DAY_NAMES[dow]}
+        slots={pickerSlots}
+        openingLabel={opening ? `${opening.startTime}–${opening.endTime}` : null}
+        isOpen={isOpen}
+        isAuthed={!!viewerId}
+        loginHref={loginHref}
+        weekStrip={weekStrip}
+        prevDateHref={
+          canGoPrev ? `/rezervace/${courtId}?date=${prevDate}` : null
+        }
+        nextDateHref={
+          canGoNext ? `/rezervace/${courtId}?date=${nextDate}` : null
+        }
+        nextOpenDate={nextOpenDate}
+      />
     </div>
-  );
-}
-
-function LegendDot({ className }: { className: string }) {
-  return (
-    <span
-      className={`inline-block size-2.5 rounded-full border ${className}`}
-    />
   );
 }
