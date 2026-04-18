@@ -129,6 +129,21 @@ export async function createReservation(
   revalidatePath(`/rezervace/${input.courtId}`);
   revalidatePath(`/rezervace`);
   revalidatePath(`/moje-rezervace`);
+  revalidatePath(`/embed/${input.courtId}`);
+  revalidatePath(`/embed`);
+
+  // returnTo whitelist – jen interní cesty známého prefixu
+  const rawReturnTo = formData.get("returnTo");
+  const returnTo =
+    typeof rawReturnTo === "string" &&
+    (rawReturnTo === "/embed/potvrzeno" ||
+      rawReturnTo.startsWith("/embed/potvrzeno?"))
+      ? rawReturnTo
+      : null;
+  if (returnTo) {
+    const sep = returnTo.includes("?") ? "&" : "?";
+    redirect(`${returnTo}${sep}courtId=${input.courtId}`);
+  }
   redirect(`/moje-rezervace?created=1`);
 }
 

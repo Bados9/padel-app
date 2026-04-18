@@ -48,7 +48,8 @@ export async function registerAction(
     redirect: false,
   });
 
-  redirect("/");
+  const callbackUrl = (formData.get("callbackUrl") as string) || "/";
+  redirect(callbackUrl);
 }
 
 export async function loginAction(

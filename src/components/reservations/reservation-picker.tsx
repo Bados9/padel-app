@@ -54,6 +54,10 @@ type Props = {
   prevDateHref: string | null;
   nextDateHref: string | null;
   nextOpenDate: string | null; // pokud je zavřeno, kdy je dál otevřeno
+  // Základ URL pro přepínání dne v week stripu. Default "/rezervace/<id>".
+  baseDateHref?: string;
+  // Kam redirectnout po úspěšné rezervaci (whitelist na serveru).
+  returnTo?: string;
 };
 
 const SLOT_MINUTES = 30;
@@ -87,7 +91,10 @@ export function ReservationPicker({
   prevDateHref,
   nextDateHref,
   nextOpenDate,
+  baseDateHref,
+  returnTo,
 }: Props) {
+  const dateBase = baseDateHref ?? `/rezervace/${courtId}`;
   const router = useRouter();
   const [state, formAction, pending] = useActionState<
     ActionState | undefined,
@@ -156,6 +163,9 @@ export function ReservationPicker({
       <input type="hidden" name="visibility" value={visibility} />
       <input type="hidden" name="neededPlayers" value={neededPlayers} />
       <input type="hidden" name="preferredLevel" value={preferredLevel} />
+      {returnTo ? (
+        <input type="hidden" name="returnTo" value={returnTo} />
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         {/* LEVÝ SLOUPEC – datum + slot grid */}
@@ -233,7 +243,7 @@ export function ReservationPicker({
                 return (
                   <Link
                     key={d.date}
-                    href={`/rezervace/${courtId}?date=${d.date}`}
+                    href={`${dateBase}?date=${d.date}`}
                     className={baseClass}
                   >
                     {content}
@@ -280,7 +290,7 @@ export function ReservationPicker({
                 </p>
                 {nextOpenDate ? (
                   <Link
-                    href={`/rezervace/${courtId}?date=${nextOpenDate}`}
+                    href={`${dateBase}?date=${nextOpenDate}`}
                     className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                   >
                     Nejbližší otevřený den →

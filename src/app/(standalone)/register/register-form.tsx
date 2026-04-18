@@ -9,11 +9,12 @@ import { registerAction, type ActionState } from "@/server/actions/auth";
 
 const initialState: ActionState = {};
 
-export function RegisterForm() {
+export function RegisterForm({ callbackUrl = "/" }: { callbackUrl?: string }) {
   const [state, formAction, isPending] = useActionState(registerAction, initialState);
 
   return (
     <form action={formAction} className="space-y-4">
+      <input type="hidden" name="callbackUrl" value={callbackUrl} />
       <div className="space-y-1.5">
         <Label htmlFor="name">Jméno</Label>
         <Input id="name" name="name" required autoComplete="name" />

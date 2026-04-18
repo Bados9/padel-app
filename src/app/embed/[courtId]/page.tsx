@@ -1,0 +1,234 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, Home, Layers, Sun } from "lucide-react";
+import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import {
+  clubDayOfWeek,
+  formatDateCZ,
+  generateDaySlots,
+  shiftDate,
+  todayInClubTz,
+} from "@/lib/time";
+import { MAX_DAYS_AHEAD } from "@/lib/club";
+import { SURFACE_LABEL } from "@/lib/labels";
+import {
+  ReservationPicker,
+  type PickerSlot,
+  type SlotState,
+} from "@/components/reservations/reservation-picker";
+
+type PageProps = {
+  params: Promise<{ courtId: string }>;
+  searchParams: Promise<{ date?: string }>;
+};
+
+const DAY_NAMES = ["Po", "Út", "St", "Čt", "Pá", "So", "Ne"];
+
+export default async function EmbedCourtPage({
+  params,
+  searchParams,
+}: PageProps) {
+  const { courtId } = await params;
+  const sp = await searchParams;
+
+  const court = await db.court.findUnique({
+    where: { id: courtId },
+    include: { openingHours: true },
+  });
+  if (!court || !court.active) notFound();
+
+  const today = todayInClubTz();
+  const maxDate = shiftDate(today, MAX_DAYS_AHEAD);
+  const requestedDate = sp.date ?? today;
+  const date =
+    requestedDate < today
+      ? today
+      : requestedDate > maxDate
+        ? maxDate
+        : requestedDate;
+
+  const dow = clubDayOfWeek(date);
+  const opening = court.openingHours.find((o) => o.dayOfWeek === dow);
+  const isOpen = !!opening;
+
+  const session = await auth();
+  const viewerId = session?.user?.id ?? null;
+
+  const daySlots = opening ? generateDaySlots(date, opening) : [];
+  let pickerSlots: PickerSlot[] = [];
+
+  if (daySlots.length > 0) {
+    const dayStart = daySlots[0].startAt;
+    const dayEnd = daySlots[daySlots.length - 1].endAt;
+
+    const reservations = await db.reservation.findMany({
+      where: {
+        courtId,
+        status: "CONFIRMED",
+        startAt: { lt: dayEnd },
+        endAt: { gt: dayStart },
+      },
+      select: {
+        id: true,
+        startAt: true,
+        endAt: true,
+        ownerId: true,
+        visibility: true,
+        neededPlayers: true,
+        _count: { select: { guests: true } },
+        guests: viewerId
+          ? { where: { userId: viewerId }, select: { userId: true } }
+          : false,
+      },
+    });
+
+    const now = Date.now();
+    pickerSlots = daySlots.map((s) => {
+      if (s.endAt.getTime() <= now) {
+        return {
+          startLabel: s.startLabel,
+          endLabel: s.endLabel,
+          state: "past" as SlotState,
+        };
+      }
+      const overlap = reservations.find(
+        (r) => r.startAt < s.endAt && r.endAt > s.startAt,
+      );
+      if (!overlap) {
+        return {
+          startLabel: s.startLabel,
+          endLabel: s.endLabel,
+          state: "free" as SlotState,
+        };
+      }
+      const isOwner = viewerId ? overlap.ownerId === viewerId : false;
+      const isGuest = viewerId ? (overlap.guests?.length ?? 0) > 0 : false;
+      const freeSpots = Math.max(
+        0,
+        overlap.neededPlayers - overlap._count.guests,
+      );
+      const isOpenPublic =
+        overlap.visibility === "PUBLIC" && freeSpots > 0;
+
+      if (isOwner || isGuest) {
+        return {
+          startLabel: s.startLabel,
+          endLabel: s.endLabel,
+          state: "own" as SlotState,
+          // V embedu hry neřešíme – link vynech
+        };
+      }
+      if (isOpenPublic) {
+        return {
+          startLabel: s.startLabel,
+          endLabel: s.endLabel,
+          state: "open" as SlotState,
+          freeSpots,
+        };
+      }
+      return {
+        startLabel: s.startLabel,
+        endLabel: s.endLabel,
+        state: "reserved" as SlotState,
+      };
+    });
+  }
+
+  const weekStripStart = shiftDate(date, -3);
+  const weekStrip = Array.from({ length: 7 }).map((_, i) => {
+    const d = shiftDate(weekStripStart, i);
+    const jsDate = new Date(`${d}T12:00:00Z`);
+    return {
+      date: d,
+      dayName: DAY_NAMES[clubDayOfWeek(d)],
+      dayNum: jsDate.getUTCDate().toString(),
+      isToday: d === today,
+      isCurrent: d === date,
+      isDisabled: d < today || d > maxDate,
+    };
+  });
+
+  let nextOpenDate: string | null = null;
+  if (!isOpen) {
+    for (let i = 1; i <= MAX_DAYS_AHEAD; i++) {
+      const candidate = shiftDate(date, i);
+      if (candidate > maxDate) break;
+      const cDow = clubDayOfWeek(candidate);
+      if (court.openingHours.some((o) => o.dayOfWeek === cDow)) {
+        nextOpenDate = candidate;
+        break;
+      }
+    }
+  }
+
+  const prevDate = shiftDate(date, -1);
+  const nextDate = shiftDate(date, 1);
+  const canGoPrev = prevDate >= today;
+  const canGoNext = nextDate <= maxDate;
+
+  const loginHref = `/embed/login?callbackUrl=${encodeURIComponent(
+    `/embed/${courtId}?date=${date}`,
+  )}`;
+
+  return (
+    <div className="px-4 py-5 space-y-5">
+      <div className="space-y-3">
+        <Link
+          href="/embed"
+          className="inline-flex items-center gap-1 text-sm text-foreground-muted hover:text-foreground transition"
+        >
+          <ArrowLeft className="size-3.5" />
+          Všechny kurty
+        </Link>
+
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-h2">{court.name}</h1>
+            {court.description ? (
+              <p className="text-sm text-foreground-muted mt-1">
+                {court.description}
+              </p>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-sunken px-2.5 py-1 text-[11px] font-medium text-foreground-muted">
+              {court.indoor ? (
+                <>
+                  <Home className="size-3" /> Krytý
+                </>
+              ) : (
+                <>
+                  <Sun className="size-3" /> Venkovní
+                </>
+              )}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-sunken px-2.5 py-1 text-[11px] font-medium text-foreground-muted">
+              <Layers className="size-3" />
+              {SURFACE_LABEL[court.surface]}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <ReservationPicker
+        courtId={courtId}
+        courtName={court.name}
+        date={date}
+        dateLabel={formatDateCZ(date)}
+        dayName={DAY_NAMES[dow]}
+        slots={pickerSlots}
+        openingLabel={opening ? `${opening.startTime}–${opening.endTime}` : null}
+        isOpen={isOpen}
+        isAuthed={!!viewerId}
+        loginHref={loginHref}
+        weekStrip={weekStrip}
+        prevDateHref={canGoPrev ? `/embed/${courtId}?date=${prevDate}` : null}
+        nextDateHref={canGoNext ? `/embed/${courtId}?date=${nextDate}` : null}
+        nextOpenDate={nextOpenDate}
+        baseDateHref={`/embed/${courtId}`}
+        returnTo="/embed/potvrzeno"
+      />
+    </div>
+  );
+}

@@ -56,8 +56,7 @@ export default async function EmbedHome() {
                     </p>
                   </div>
                   <Link
-                    href={`/rezervace/${c.id}`}
-                    target="_top"
+                    href={`/embed/${c.id}`}
                     className={buttonVariants({ size: "sm" })}
                   >
                     Rezervovat
