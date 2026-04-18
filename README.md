@@ -62,7 +62,7 @@ padel-app/
 - **M2** – Core booking (kurty, kalendář, rezervace, moje rezervace) _(hotovo)_
 - **M3** – Matchmaking (veřejné rezervace + level) _(hotovo)_
 - **M4** – Admin UI (dashboard, CRUD kurtů, uživatelé) _(hotovo)_
-- **M5** – UI polish + responsive
+- **M5** – UI polish + responsive _(hotovo)_
 - **M6** – Prod Docker + VPS deploy + GitHub Actions
 
 ## Deploy (produkce)

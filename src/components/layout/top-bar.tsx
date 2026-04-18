@@ -7,12 +7,12 @@ export async function TopBar() {
 
   return (
     <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-40">
-      <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="font-bold text-lg tracking-tight">
+      <div className="mx-auto max-w-6xl px-4 min-h-14 py-2 flex items-center justify-between gap-2 flex-wrap">
+        <Link href="/" className="font-bold text-lg tracking-tight shrink-0">
           <span className="text-emerald-600">●</span> Padel klub
         </Link>
 
-        <nav className="flex items-center gap-4 text-sm">
+        <nav className="flex items-center gap-3 text-sm flex-wrap">
           <Link href="/rezervace" className="hover:underline">Rezervace</Link>
           <Link href="/hry" className="hover:underline">Otevřené hry</Link>
           {session?.user ? (
@@ -24,7 +24,7 @@ export async function TopBar() {
 
           {session?.user ? (
             <div className="flex items-center gap-2">
-              <Link href="/moje-rezervace" className="text-muted-foreground hover:underline">
+              <Link href="/profil" className="text-muted-foreground hover:underline">
                 {session.user.name}
               </Link>
               <form

@@ -13,7 +13,7 @@ export default async function Home() {
 
       <section className="mx-auto max-w-5xl px-4 py-16 sm:py-24 text-center space-y-6">
         <Badge variant="outline" className="border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
-          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" /> M1 – DB + Auth hotovo
+          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" /> Rezervace · matchmaking · admin
         </Badge>
         <h1 className="text-4xl sm:text-6xl font-bold tracking-tight">
           Padel, kdykoliv a s kýmkoliv
@@ -47,17 +47,17 @@ export default async function Home() {
           {
             title: "Rezervace",
             desc: "Vyber si kurt, den a čas. Rezervace na pár kliknutí.",
-            status: "M2",
+            status: "hotovo",
           },
           {
             title: "Matchmaking",
-            desc: "Nejde vás dost? Označ rezervaci jako otevřenou a najde se partie.",
-            status: "M3",
+            desc: "Není vás dost? Označ rezervaci jako otevřenou a najde se partie.",
+            status: "hotovo",
           },
           {
             title: "Admin klubu",
             desc: "Správa kurtů, uživatelů a rezervací v jednom přehledu.",
-            status: "M4",
+            status: "hotovo",
           },
         ].map((f) => (
           <Card key={f.title}>
