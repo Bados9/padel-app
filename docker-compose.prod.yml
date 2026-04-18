@@ -1,0 +1,73 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      target: runner
+      args:
+        NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-/padel}
+    image: padel-app:latest
+    container_name: padel-app-prod
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3101:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-/padel}
+      DATABASE_URL: postgresql://padel:${POSTGRES_PASSWORD}@postgres:5432/padel?schema=public
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_TRUST_HOST: "true"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - padel
+
+  # Jednorázový kontejner: pustí prisma migrate deploy a skončí.
+  # `restart: "no"` a `depends_on.service_completed_successfully` zajistí,
+  # že app stage čeká na dokončení migrace.
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      target: migrator
+      args:
+        NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-/padel}
+    image: padel-app:migrator
+    container_name: padel-app-migrate
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://padel:${POSTGRES_PASSWORD}@postgres:5432/padel?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - padel
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: padel-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: padel
+      POSTGRES_USER: padel
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - padel_postgres_data_prod:/var/lib/postgresql/data
+    # Žádný host port – DB pouze interně v docker network (bezpečnější na sdílené VPS).
+    # Pro ad-hoc přístup: `docker compose -f docker-compose.prod.yml exec postgres psql -U padel`
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U padel -d padel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - padel
+
+volumes:
+  padel_postgres_data_prod:
+
+networks:
+  padel:
+    name: padel_prod_network

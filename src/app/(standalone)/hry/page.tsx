@@ -110,7 +110,7 @@ export default async function GamesListPage({ searchParams }: PageProps) {
                       {g.owner.level ? ` · ${LEVEL_LABEL[g.owner.level]}` : ""}
                     </p>
                     {g.notes ? (
-                      <p className="text-xs text-muted-foreground italic">„{g.notes}"</p>
+                      <p className="text-xs text-muted-foreground italic">„{g.notes}“</p>
                     ) : null}
                   </div>
                   <div className="flex flex-col items-end gap-1">

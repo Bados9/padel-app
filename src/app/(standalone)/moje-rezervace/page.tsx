@@ -117,7 +117,7 @@ export default async function MyReservationsPage({ searchParams }: PageProps) {
                     ) : null}
                     {r.notes ? (
                       <p className="text-xs text-muted-foreground italic">
-                        „{r.notes}"
+                        „{r.notes}“
                       </p>
                     ) : null}
                   </div>

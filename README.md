@@ -50,8 +50,11 @@ padel-app/
 │   ├── lib/                     # auth, db, utility
 │   └── server/                  # Server Actions / use-cases
 ├── docker-compose.yml           # dev
-├── docker-compose.prod.yml      # [M6] prod pro VPS
-├── .env.example
+├── docker-compose.prod.yml      # prod pro VPS
+├── docs/nginx-padel.conf        # nginx `location /padel/` snippet pro beer-app
+├── scripts/                     # deploy.sh, seed-prod.sh
+├── .github/workflows/deploy.yml # CI + SSH deploy
+├── .env.example / .env.production.example
 └── TODO-PROTOTYPE.md            # seznam záměrných ústupků prototypu
 ```
 
@@ -63,11 +66,47 @@ padel-app/
 - **M3** – Matchmaking (veřejné rezervace + level) _(hotovo)_
 - **M4** – Admin UI (dashboard, CRUD kurtů, uživatelé) _(hotovo)_
 - **M5** – UI polish + responsive _(hotovo)_
-- **M6** – Prod Docker + VPS deploy + GitHub Actions
+- **M6** – Prod Docker + VPS deploy + GitHub Actions _(hotovo)_
 
 ## Deploy (produkce)
 
-_Popsáno v M6._ V prod Next.js běží s `NEXT_PUBLIC_BASE_PATH=/padel` a vystavuje se na `127.0.0.1:3101`. Routing zajišťuje reverse proxy běžící beer-app nginx (přidaný `location /padel/` blok).
+V prod Next.js běží s `NEXT_PUBLIC_BASE_PATH=/padel` a vystavuje se na `127.0.0.1:3101`. Routing zajišťuje reverse proxy běžící beer-app nginx (přidaný `location /padel/` blok).
+
+### Prvotní nasazení na VPS
+
+```bash
+# 1) klonování na VPS (např. /opt/padel-app)
+sudo mkdir -p /opt/padel-app && sudo chown $USER:$USER /opt/padel-app
+git clone https://github.com/<owner>/padel-app.git /opt/padel-app
+cd /opt/padel-app
+
+# 2) prod env (NEVERSIONOVANÝ)
+cp .env.production.example .env
+# vyplň POSTGRES_PASSWORD a AUTH_SECRET (openssl rand -base64 32)
+
+# 3) první deploy (build image + up + prisma migrate deploy v entrypointu)
+./scripts/deploy.sh
+
+# 4) seed administrátorského účtu + kurtů (jednorázově)
+./scripts/seed-prod.sh
+
+# 5) nginx: přidej `docs/nginx-padel.conf` blok do beer-app configu a reloadni
+sudo nginx -t && sudo nginx -s reload
+```
+
+### Automatický deploy z GitHub Actions
+
+Workflow `.github/workflows/deploy.yml` po pushi do `main`:
+1. Verifikuje `typecheck` + `lint`.
+2. SSH na VPS a spustí `scripts/deploy.sh` (git pull + rebuild + up -d).
+
+Potřebné GitHub secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_PATH` (např. `/opt/padel-app`), volitelně `VPS_PORT`.
+
+### Ruční aktualizace na VPS
+
+```bash
+cd /opt/padel-app && ./scripts/deploy.sh
+```
 
 ## Koexistence s beer-app na stejné VPS
 

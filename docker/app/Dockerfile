@@ -51,3 +51,9 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
+
+# ---------- migrator (jednorázové `prisma migrate deploy` / `db seed`) ----------
+# Má plné node_modules z builderu, takže prisma CLI funguje i s tranzitivními deps.
+FROM builder AS migrator
+ENV NODE_ENV=production
+CMD ["node", "node_modules/prisma/build/index.js", "migrate", "deploy"]

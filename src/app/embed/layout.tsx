@@ -1,6 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { IframeAutoresize } from "@/components/embed/iframe-autoresize";
 
+export const dynamic = "force-dynamic";
+
 export default function EmbedLayout({
   children,
 }: {

@@ -1,6 +1,8 @@
 import { TopBar } from "@/components/layout/top-bar";
 import { Toaster } from "@/components/ui/sonner";
 
+export const dynamic = "force-dynamic";
+
 export default function StandaloneLayout({
   children,
 }: {

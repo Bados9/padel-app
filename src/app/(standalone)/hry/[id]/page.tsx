@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { formatDateTimeCZ, formatTimeCZ } from "@/lib/time";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { JoinLeaveButton } from "@/components/reservations/join-leave-button";
 
@@ -84,7 +84,7 @@ export default async function GameDetailPage({ params }: PageProps) {
       {game.notes ? (
         <Card>
           <CardContent className="pt-4">
-            <p className="text-sm italic text-muted-foreground">„{game.notes}"</p>
+            <p className="text-sm italic text-muted-foreground">„{game.notes}“</p>
           </CardContent>
         </Card>
       ) : null}
