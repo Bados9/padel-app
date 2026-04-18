@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CancelButton } from "@/components/reservations/cancel-button";
+import { JoinLeaveButton } from "@/components/reservations/join-leave-button";
 
 export const metadata = { title: "Moje rezervace · Padel klub" };
 
@@ -23,7 +24,7 @@ export default async function MyReservationsPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const now = new Date();
 
-  const [upcoming, past] = await Promise.all([
+  const [upcoming, guestGames, past] = await Promise.all([
     db.reservation.findMany({
       where: {
         ownerId: session.user.id,
@@ -32,6 +33,18 @@ export default async function MyReservationsPage({ searchParams }: PageProps) {
       },
       orderBy: { startAt: "asc" },
       include: { court: { select: { id: true, name: true } } },
+    }),
+    db.reservation.findMany({
+      where: {
+        status: "CONFIRMED",
+        endAt: { gt: now },
+        guests: { some: { userId: session.user.id } },
+      },
+      orderBy: { startAt: "asc" },
+      include: {
+        court: { select: { id: true, name: true } },
+        owner: { select: { name: true } },
+      },
     }),
     db.reservation.findMany({
       where: {
@@ -109,6 +122,45 @@ export default async function MyReservationsPage({ searchParams }: PageProps) {
                     ) : null}
                   </div>
                   <CancelButton reservationId={r.id} />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Účastním se jako host</h2>
+        {guestGames.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Zatím se neúčastníš žádné otevřené hry.{" "}
+            <Link href="/hry" className="underline">
+              Prohlédnout otevřené hry
+            </Link>
+            .
+          </p>
+        ) : (
+          <div className="grid gap-3">
+            {guestGames.map((r) => (
+              <Card key={r.id}>
+                <CardContent className="pt-4 flex items-start justify-between gap-4 flex-wrap">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/hry/${r.id}`}
+                        className="font-semibold hover:underline"
+                      >
+                        {r.court.name}
+                      </Link>
+                      <Badge variant="outline" className="text-xs">
+                        u {r.owner.name}
+                      </Badge>
+                    </div>
+                    <p className="text-sm">
+                      {formatDateTimeCZ(r.startAt)} – {formatTimeCZ(r.endAt)}
+                    </p>
+                  </div>
+                  <JoinLeaveButton reservationId={r.id} mode="leave" />
                 </CardContent>
               </Card>
             ))}
