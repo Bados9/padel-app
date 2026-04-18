@@ -52,6 +52,12 @@ Tenhle dokument je **živý seznam** všeho, co vědomě zjednodušujeme / vynec
 - [ ] **HTTPS** – zatím ne, jedeme přes IP (HTTP); přidáme s doménou
 - [ ] **Migrace na Traefik** místo přidávání `location` bloku v beer-app nginx
 
+## Embed / iframe
+
+- [ ] **JS snippet pro auto-resize iframu** (postMessage `{type: "padel-resize", height}`) – zatím jen základní iframe bez auto-resize
+- [ ] **Dokumentační stránka `/embed-docs`** s copy-paste příkladem pro kluby
+- [ ] **Přepnutí CSP `frame-ancestors` z `*` na whitelist** – teď povolujeme framing odkudkoli kvůli prototypu
+
 ## UI / UX
 
 - [ ] **i18n – EN / další jazyky** – nasazeno pouze CS přes next-intl

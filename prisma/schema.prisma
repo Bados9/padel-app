@@ -1,0 +1,150 @@
+// Padel rezervační systém
+// Prisma 7 schema, single-tenant prototyp (jeden klub, pouze padel)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Uživatelé ----------
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum PlayerLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  PRO
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  passwordHash String
+  name         String
+  role         UserRole    @default(USER)
+  level        PlayerLevel @default(BEGINNER)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  reservationsOwned Reservation[]      @relation("ReservationOwner")
+  reservationGuests ReservationGuest[]
+}
+
+// ---------- Kurty ----------
+
+enum CourtSurface {
+  ARTIFICIAL_GRASS
+  CARPET
+  CONCRETE
+}
+
+model Court {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  description String?
+  surface     CourtSurface @default(ARTIFICIAL_GRASS)
+  indoor      Boolean      @default(true)
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  openingHours OpeningHours[]
+  reservations Reservation[]
+}
+
+// Otevírací doba kurtu per den v týdnu
+// dayOfWeek: 0 = pondělí … 6 = neděle
+model OpeningHours {
+  id        String @id @default(cuid())
+  courtId   String
+  dayOfWeek Int
+  // HH:MM uloženo jako string, v aplikaci interpretujeme v lokální TZ klubu
+  startTime String
+  endTime   String
+
+  court Court @relation(fields: [courtId], references: [id], onDelete: Cascade)
+
+  @@unique([courtId, dayOfWeek])
+}
+
+// ---------- Rezervace ----------
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+enum ReservationVisibility {
+  PRIVATE
+  PUBLIC
+}
+
+model Reservation {
+  id             String                @id @default(cuid())
+  courtId        String
+  ownerId        String
+  startAt        DateTime
+  endAt          DateTime
+  status         ReservationStatus     @default(CONFIRMED)
+  visibility     ReservationVisibility @default(PRIVATE)
+  // Pro padel je max kapacita 4. 0 = nehledáme další hráče.
+  neededPlayers  Int                   @default(0)
+  preferredLevel PlayerLevel?
+  notes          String?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  court  Court              @relation(fields: [courtId], references: [id])
+  owner  User               @relation("ReservationOwner", fields: [ownerId], references: [id])
+  guests ReservationGuest[]
+
+  // STUB pro budoucí platby (v prototypu nevyužíváme)
+  payment Payment?
+
+  @@index([courtId, startAt, endAt])
+  @@index([visibility, neededPlayers])
+  @@index([ownerId])
+}
+
+model ReservationGuest {
+  id            String   @id @default(cuid())
+  reservationId String
+  userId        String
+  joinedAt      DateTime @default(now())
+
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id])
+
+  @@unique([reservationId, userId])
+}
+
+// ---------- Platby (STUB – v prototypu nevyužíváme) ----------
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  reservationId String        @unique
+  amount        Int // částka v haléřích
+  currency      String        @default("CZK")
+  status        PaymentStatus @default(PENDING)
+  method        String?
+  externalId    String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+}
