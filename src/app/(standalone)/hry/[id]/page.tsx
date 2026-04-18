@@ -11,8 +11,8 @@ import { auth } from "@/lib/auth";
 import { formatDateCZ, formatTimeCZ } from "@/lib/time";
 import {
   LEVEL_LABEL,
-  playersLabel,
   relativeTimeCs,
+  spotsLabel,
 } from "@/lib/labels";
 import { JoinLeaveButton } from "@/components/reservations/join-leave-button";
 
@@ -172,7 +172,7 @@ export default async function GameDetailPage({ params }: PageProps) {
           )}
           {!isOwner && viewerId && freeSpots > 0 && !isGuest ? (
             <p className="text-xs text-foreground-subtle">
-              {playersLabel(freeSpots)} volné{freeSpots === 1 ? "" : "á místa"}
+              Zbývá {spotsLabel(freeSpots)}
             </p>
           ) : null}
         </div>

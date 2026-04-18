@@ -2,10 +2,27 @@ import Link from "next/link";
 import { ArrowRight, Clock, Home, Layers, Sun } from "lucide-react";
 import { db } from "@/lib/db";
 import { SURFACE_LABEL } from "@/lib/labels";
+import { clubDayOfWeek, todayInClubTz } from "@/lib/time";
 
 export const metadata = { title: "Rezervace kurtů · Padel klub" };
 
 const DAY_NAMES = ["Po", "Út", "St", "Čt", "Pá", "So", "Ne"];
+
+// Spojitý interval dnů se stejným startTime+endTime → "Po–Pá 8:00–22:00",
+// nebo vrátí null, pokud se časy liší nebo je kurt zavřený většinu dnů.
+function summarizeOpening(
+  hours: Array<{ dayOfWeek: number; startTime: string; endTime: string }>,
+): string | null {
+  if (hours.length === 0) return null;
+  const first = hours[0];
+  const allSame = hours.every(
+    (h) => h.startTime === first.startTime && h.endTime === first.endTime,
+  );
+  if (!allSame) return null;
+  if (hours.length === 7) return `Po–Ne ${first.startTime}–${first.endTime}`;
+  const days = hours.map((h) => DAY_NAMES[h.dayOfWeek]).join(" · ");
+  return `${days} · ${first.startTime}–${first.endTime}`;
+}
 
 export default async function CourtsPage() {
   const courts = await db.court.findMany({
@@ -16,6 +33,9 @@ export default async function CourtsPage() {
       _count: { select: { reservations: true } },
     },
   });
+
+  const today = todayInClubTz();
+  const dowToday = clubDayOfWeek(today);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 space-y-10">
@@ -33,8 +53,10 @@ export default async function CourtsPage() {
       ) : (
         <div className="grid gap-5 sm:grid-cols-2">
           {courts.map((c) => {
-            const opening = c.openingHours[0];
-            const openingDays = c.openingHours.map((o) => DAY_NAMES[o.dayOfWeek]);
+            const summary = summarizeOpening(c.openingHours);
+            const todaysOpening = c.openingHours.find(
+              (o) => o.dayOfWeek === dowToday,
+            );
             return (
               <Link
                 key={c.id}
@@ -77,23 +99,22 @@ export default async function CourtsPage() {
                       <Layers className="size-3" />
                       {SURFACE_LABEL[c.surface]}
                     </span>
-                    {opening ? (
+                    {todaysOpening ? (
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted font-mono tnum">
                         <Clock className="size-3" />
-                        {opening.startTime}–{opening.endTime}
+                        dnes {todaysOpening.startTime}–{todaysOpening.endTime}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-warning-soft px-2.5 py-1 text-xs font-medium text-warning">
-                        Bez otevírací doby
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
+                        <Clock className="size-3" />
+                        dnes zavřeno
                       </span>
                     )}
                   </div>
 
                   <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-foreground-subtle">
-                    <span>
-                      Otevřeno: {openingDays.length > 0 ? openingDays.join(" · ") : "—"}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                    <span className="truncate">{summary ?? "Otevřeno podle rozpisu"}</span>
+                    <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground group-hover:text-primary transition-colors shrink-0">
                       Dostupnost
                       <ArrowRight className="size-3.5 transition group-hover:translate-x-0.5" />
                     </span>

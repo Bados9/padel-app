@@ -190,37 +190,52 @@ export function ReservationPicker({
               </div>
             </div>
             <div className="grid grid-cols-7 gap-1.5">
-              {weekStrip.map((d) => (
-                <Link
-                  key={d.date}
-                  href={
-                    d.isDisabled ? "#" : `/rezervace/${courtId}?date=${d.date}`
-                  }
-                  aria-disabled={d.isDisabled}
-                  className={cn(
-                    "flex flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-center transition",
-                    d.isDisabled && "opacity-30 pointer-events-none",
-                    d.isCurrent
-                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
-                      : "hover:bg-surface-sunken text-foreground",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "text-[10px] uppercase tracking-wider",
-                      d.isCurrent
-                        ? "text-primary-foreground/80"
-                        : "text-foreground-subtle",
-                    )}
+              {weekStrip.map((d) => {
+                const content = (
+                  <>
+                    <span
+                      className={cn(
+                        "text-[10px] uppercase tracking-wider",
+                        d.isCurrent
+                          ? "text-primary-foreground/80"
+                          : "text-foreground-subtle",
+                      )}
+                    >
+                      {d.dayName}
+                    </span>
+                    <span className="text-sm font-semibold tnum">{d.dayNum}</span>
+                    {d.isToday && !d.isCurrent ? (
+                      <span className="size-1 rounded-full bg-primary" />
+                    ) : null}
+                  </>
+                );
+                const baseClass = cn(
+                  "flex flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-center transition",
+                  d.isCurrent
+                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
+                    : "hover:bg-surface-sunken text-foreground",
+                );
+                if (d.isDisabled) {
+                  return (
+                    <span
+                      key={d.date}
+                      aria-disabled="true"
+                      className={cn(baseClass, "opacity-30")}
+                    >
+                      {content}
+                    </span>
+                  );
+                }
+                return (
+                  <Link
+                    key={d.date}
+                    href={`/rezervace/${courtId}?date=${d.date}`}
+                    className={baseClass}
                   >
-                    {d.dayName}
-                  </span>
-                  <span className="text-sm font-semibold tnum">{d.dayNum}</span>
-                  {d.isToday && !d.isCurrent ? (
-                    <span className="size-1 rounded-full bg-primary" />
-                  ) : null}
-                </Link>
-              ))}
+                    {content}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
@@ -338,12 +353,12 @@ export function ReservationPicker({
           </div>
 
           {/* Détail: délka + typ hry + notes – jen když už je vybrán slot */}
-          <div
+          <fieldset
+            disabled={!selectedStart}
             className={cn(
               "space-y-5 rounded-2xl border border-border bg-surface-raised p-5 shadow-sm transition",
-              !selectedStart && "opacity-60 pointer-events-none",
+              !selectedStart && "opacity-60",
             )}
-            aria-hidden={!selectedStart}
           >
             <div className="space-y-2">
               <Label className="text-caption text-foreground-subtle">
@@ -416,7 +431,7 @@ export function ReservationPicker({
               <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-1">
                 <div className="space-y-1">
                   <Label htmlFor="np" className="text-caption text-foreground-subtle">
-                    Hráči
+                    Hledám spoluhráče
                   </Label>
                   <select
                     id="np"
@@ -424,11 +439,9 @@ export function ReservationPicker({
                     onChange={(e) => setNeededPlayers(Number(e.target.value))}
                     className="h-9 w-full rounded-md border border-input bg-surface-raised px-2.5 text-sm"
                   >
-                    {[1, 2, 3].map((n) => (
-                      <option key={n} value={n}>
-                        hledám {n}
-                      </option>
-                    ))}
+                    <option value={1}>1 volné místo</option>
+                    <option value={2}>2 volná místa</option>
+                    <option value={3}>3 volná místa</option>
                   </select>
                 </div>
                 <div className="space-y-1">
@@ -467,7 +480,7 @@ export function ReservationPicker({
                 placeholder="Např. hrajeme s vlastními míči…"
               />
             </div>
-          </div>
+          </fieldset>
 
           {state?.error ? (
             <Alert variant="destructive">
@@ -485,6 +498,40 @@ export function ReservationPicker({
           </button>
         </aside>
       </div>
+
+      {/* Mobile sticky bottom CTA – viditelné pod lg */}
+      {isAuthed ? (
+        <div className="sticky bottom-0 z-30 -mx-4 border-t border-border bg-surface-raised/95 px-4 py-3 backdrop-blur lg:hidden">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              {selectedStart && selectedRange ? (
+                <>
+                  <div className="truncate font-mono tnum text-sm font-semibold">
+                    {selectedStart}–{minToLabel(selectedRange.endMin)}
+                  </div>
+                  <div className="truncate text-[11px] text-foreground-subtle">
+                    {effectiveDuration} min · {visibility === "PRIVATE" ? "soukromá" : "otevřená"}
+                  </div>
+                </>
+              ) : (
+                <div className="text-xs text-foreground-muted">
+                  Vyber čas v kalendáři výš
+                </div>
+              )}
+            </div>
+            <Button type="submit" disabled={!canSubmit} className="shrink-0">
+              {pending ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Rezervuji
+                </>
+              ) : (
+                "Rezervovat"
+              )}
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </form>
   );
 }
@@ -532,7 +579,7 @@ function SlotGridInteractive({
               inRange &&
                 "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/30",
               isSelectedStart &&
-                "ring-2 ring-primary ring-offset-2 ring-offset-background z-10",
+                "ring-2 ring-primary ring-offset-1 ring-offset-background z-10",
             )}
           >
             <span className="font-mono tnum text-[13px] font-semibold leading-none">

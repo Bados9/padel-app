@@ -63,5 +63,5 @@ export function relativeTimeCs(target: Date, now: Date = new Date()): string {
       ? `za ${days} ${pluralCs(days, ["den", "dny", "dní"])}`
       : `před ${days} ${pluralCs(days, ["dnem", "dny", "dny"])}`;
   }
-  return "";
+  return future ? `za ${days} dní` : `před ${days} dny`;
 }

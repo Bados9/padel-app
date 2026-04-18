@@ -5,7 +5,6 @@ import { auth } from "@/lib/auth";
 import { formatDateCZ, formatTimeCZ } from "@/lib/time";
 import {
   LEVEL_LABEL,
-  playersLabel,
   relativeTimeCs,
   spotsLabel,
 } from "@/lib/labels";
@@ -117,8 +116,8 @@ export default async function GamesListPage({ searchParams }: PageProps) {
                 <div className="space-y-1 sm:border-l sm:border-border sm:pl-4">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold">{g.court.name}</span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-foreground-muted">
-                      {totalPlayers}/4 {totalPlayers === 1 ? "hráč" : "hráčů"}
+                    <span className="inline-flex items-center gap-1 rounded-full bg-surface-sunken px-2 py-0.5 text-[11px] font-medium text-foreground-muted font-mono tnum">
+                      {totalPlayers}/4
                     </span>
                     {g.preferredLevel ? (
                       <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-foreground-muted">

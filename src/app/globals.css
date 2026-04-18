@@ -98,13 +98,13 @@
   --muted-foreground:     var(--foreground-muted);
 
   /* Status */
-  --success:      oklch(0.65 0.16 155);
+  --success:      oklch(0.52 0.16 155);
   --success-soft: oklch(0.95 0.05 155);
-  --warning:      oklch(0.78 0.15 75);
+  --warning:      oklch(0.48 0.16 65);   /* ztmaveno kvůli kontrastu na warning-soft */
   --warning-soft: oklch(0.96 0.06 90);
-  --danger:       oklch(0.58 0.22 25);
+  --danger:       oklch(0.55 0.22 25);
   --danger-soft:  oklch(0.96 0.04 25);
-  --info:         oklch(0.60 0.14 230);
+  --info:         oklch(0.52 0.14 230);
   --info-soft:    oklch(0.95 0.03 230);
   --destructive:  var(--danger);
 
@@ -210,9 +210,10 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Focus ring default */
+  /* Focus ring default – zdědí rounded od cíle, takže nenaruší velké karty */
   :where(button, a, input, select, textarea, [role="button"]):focus-visible {
-    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background rounded-md;
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+    border-radius: inherit;
   }
 
   /* Selection */
