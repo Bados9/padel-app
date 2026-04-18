@@ -77,26 +77,74 @@ export default async function CourtDetailPage({
         startAt: { lt: dayEnd },
         endAt: { gt: dayStart },
       },
-      select: { startAt: true, endAt: true, ownerId: true },
+      select: {
+        id: true,
+        startAt: true,
+        endAt: true,
+        ownerId: true,
+        visibility: true,
+        neededPlayers: true,
+        _count: { select: { guests: true } },
+        guests: viewerId
+          ? { where: { userId: viewerId }, select: { userId: true } }
+          : false,
+      },
     });
 
     const now = Date.now();
     pickerSlots = daySlots.map((s) => {
-      let state: SlotState = "free";
       if (s.endAt.getTime() <= now) {
-        state = "past";
-      } else {
-        const overlap = reservations.find(
-          (r) => r.startAt < s.endAt && r.endAt > s.startAt,
-        );
-        if (overlap) {
-          state = viewerId && overlap.ownerId === viewerId ? "own" : "reserved";
-        }
+        return {
+          startLabel: s.startLabel,
+          endLabel: s.endLabel,
+          state: "past" as SlotState,
+        };
       }
+      const overlap = reservations.find(
+        (r) => r.startAt < s.endAt && r.endAt > s.startAt,
+      );
+      if (!overlap) {
+        return {
+          startLabel: s.startLabel,
+          endLabel: s.endLabel,
+          state: "free" as SlotState,
+        };
+      }
+
+      const isOwner = viewerId ? overlap.ownerId === viewerId : false;
+      const isGuest = viewerId ? (overlap.guests?.length ?? 0) > 0 : false;
+      const freeSpots = Math.max(
+        0,
+        overlap.neededPlayers - overlap._count.guests,
+      );
+      const isOpenPublic =
+        overlap.visibility === "PUBLIC" && freeSpots > 0;
+
+      if (isOwner || isGuest) {
+        return {
+          startLabel: s.startLabel,
+          endLabel: s.endLabel,
+          state: "own" as SlotState,
+          // U PUBLIC hry linkujeme na detail (pro správu i případný odchod)
+          linkHref:
+            overlap.visibility === "PUBLIC" ? `/hry/${overlap.id}` : undefined,
+        };
+      }
+
+      if (isOpenPublic) {
+        return {
+          startLabel: s.startLabel,
+          endLabel: s.endLabel,
+          state: "open" as SlotState,
+          linkHref: `/hry/${overlap.id}`,
+          freeSpots,
+        };
+      }
+
       return {
         startLabel: s.startLabel,
         endLabel: s.endLabel,
-        state,
+        state: "reserved" as SlotState,
       };
     });
   }

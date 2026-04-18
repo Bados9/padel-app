@@ -20,12 +20,16 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { LEVEL_LABEL } from "@/lib/labels";
 
-export type SlotState = "free" | "reserved" | "own" | "past";
+export type SlotState = "free" | "reserved" | "own" | "past" | "open";
 
 export type PickerSlot = {
   startLabel: string; // "HH:mm" v klubové TZ
   endLabel: string;
   state: SlotState;
+  // Pro "open" a "own" (v PUBLIC hře) odkaz na detail hry.
+  linkHref?: string;
+  // Pro "open" – kolik zbývá volných míst (pro tooltip / badge).
+  freeSpots?: number;
 };
 
 type Props = {
@@ -557,31 +561,42 @@ function SlotGridInteractive({
           slotMin < selectedRange.endMin;
         const isSelectedStart = selectedStart === s.startLabel;
 
-        const disabled = s.state !== "free";
+        const stateLabel =
+          s.state === "free"
+            ? "volno"
+            : s.state === "reserved"
+              ? "obsazeno"
+              : s.state === "own"
+                ? "vaše"
+                : s.state === "open"
+                  ? s.freeSpots === 1
+                    ? "1 místo"
+                    : `${s.freeSpots ?? 0} míst`
+                  : "uplynulo";
 
-        return (
-          <button
-            key={s.startLabel}
-            type="button"
-            onClick={() => onSelect(s.startLabel)}
-            disabled={disabled}
-            data-state={s.state}
-            className={cn(
-              "relative flex min-h-[60px] flex-col items-start gap-0.5 rounded-lg border px-3 py-2 text-left transition",
-              s.state === "free" &&
-                "border-border bg-surface-raised hover:border-primary hover:bg-primary-soft cursor-pointer",
-              s.state === "reserved" &&
-                "border-border bg-surface-sunken bg-stripes text-foreground-subtle cursor-not-allowed",
-              s.state === "own" &&
-                "border-info/40 bg-info-soft text-info cursor-not-allowed",
-              s.state === "past" &&
-                "border-dashed border-border opacity-50 text-foreground-subtle cursor-not-allowed",
-              inRange &&
-                "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/30",
-              isSelectedStart &&
-                "ring-2 ring-primary ring-offset-1 ring-offset-background z-10",
-            )}
-          >
+        const baseClass = cn(
+          "relative flex min-h-[60px] flex-col items-start gap-0.5 rounded-lg border px-3 py-2 text-left transition",
+          s.state === "free" &&
+            "border-border bg-surface-raised hover:border-primary hover:bg-primary-soft cursor-pointer",
+          s.state === "reserved" &&
+            "border-border bg-surface-sunken bg-stripes text-foreground-subtle cursor-not-allowed",
+          s.state === "own" &&
+            cn(
+              "border-info/40 bg-info-soft text-info",
+              s.linkHref ? "hover:border-info cursor-pointer" : "cursor-not-allowed",
+            ),
+          s.state === "open" &&
+            "border-accent bg-accent/40 text-accent-foreground hover:border-accent-foreground/40 hover:brightness-105 cursor-pointer",
+          s.state === "past" &&
+            "border-dashed border-border opacity-50 text-foreground-subtle cursor-not-allowed",
+          inRange &&
+            "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/30",
+          isSelectedStart &&
+            "ring-2 ring-primary ring-offset-1 ring-offset-background z-10",
+        );
+
+        const content = (
+          <>
             <span className="font-mono tnum text-[13px] font-semibold leading-none">
               {s.startLabel}
             </span>
@@ -592,21 +607,56 @@ function SlotGridInteractive({
                   ? "text-primary-foreground/80"
                   : s.state === "own"
                     ? "text-info"
-                    : "text-foreground-subtle",
+                    : s.state === "open"
+                      ? "text-accent-foreground"
+                      : "text-foreground-subtle",
               )}
             >
               {inRange
                 ? isSelectedStart
                   ? "start"
                   : "zabráno"
-                : s.state === "free"
-                  ? "volno"
-                  : s.state === "reserved"
-                    ? "obsazeno"
-                    : s.state === "own"
-                      ? "vaše"
-                      : "uplynulo"}
+                : stateLabel}
             </span>
+            {s.state === "open" && !inRange ? (
+              <span
+                aria-hidden
+                className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-accent-foreground/70 animate-pulse"
+              />
+            ) : null}
+          </>
+        );
+
+        // "open" a "own"+linkHref vedou na detail hry
+        if ((s.state === "open" || s.state === "own") && s.linkHref && !inRange) {
+          return (
+            <Link
+              key={s.startLabel}
+              href={s.linkHref}
+              data-state={s.state}
+              className={baseClass}
+              title={
+                s.state === "open"
+                  ? "Otevřená hra – klikni pro detail a přidání"
+                  : "Tvoje hra – klikni pro detail"
+              }
+            >
+              {content}
+            </Link>
+          );
+        }
+
+        const disabled = s.state !== "free";
+        return (
+          <button
+            key={s.startLabel}
+            type="button"
+            onClick={() => onSelect(s.startLabel)}
+            disabled={disabled}
+            data-state={s.state}
+            className={baseClass}
+          >
+            {content}
           </button>
         );
       })}
@@ -618,8 +668,13 @@ function LegendRow() {
   const items: Array<{ state: SlotState; label: string; cls: string }> = [
     { state: "free", label: "Volné", cls: "bg-surface-raised border-border" },
     {
+      state: "open",
+      label: "Otevřená hra – přidej se",
+      cls: "bg-accent/40 border-accent",
+    },
+    {
       state: "reserved",
-      label: "Obsazené",
+      label: "Plně obsazené",
       cls: "bg-surface-sunken bg-stripes border-border",
     },
     {
