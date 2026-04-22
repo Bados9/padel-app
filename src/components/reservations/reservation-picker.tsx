@@ -171,7 +171,7 @@ export function ReservationPicker({
         {/* LEVÝ SLOUPEC – datum + slot grid */}
         <div className="space-y-5">
           {/* Week strip */}
-          <div className="rounded-2xl border border-border bg-surface-raised p-3 shadow-sm space-y-3">
+          <div className="rounded-3xl bg-surface-raised p-4 shadow-soft ring-1 ring-border space-y-3">
             <div className="flex items-center justify-between">
               <div className="text-caption text-foreground-subtle">Datum</div>
               <div className="flex items-center gap-1">
@@ -254,13 +254,13 @@ export function ReservationPicker({
           </div>
 
           {/* Slot grid / zavřeno stav */}
-          <div className="rounded-2xl border border-border bg-surface-raised p-5 shadow-sm space-y-4">
+          <div className="rounded-3xl bg-surface-raised p-6 shadow-soft ring-1 ring-border space-y-4">
             <div className="flex flex-wrap items-end justify-between gap-2">
               <div>
-                <div className="text-caption text-foreground-subtle">
+                <div className="text-caption">
                   {dayName} · {dateLabel}
                 </div>
-                <h2 className="text-h2 mt-0.5">
+                <h2 className="text-h2 mt-1">
                   {isOpen ? "Vyber si začátek" : "Kurt je zavřený"}
                 </h2>
               </div>
@@ -303,7 +303,7 @@ export function ReservationPicker({
 
         {/* PRAVÝ SLOUPEC – summary + detaily + submit */}
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <div className="rounded-2xl border border-border-strong bg-surface-raised p-5 shadow-md space-y-4">
+          <div className="rounded-3xl bg-surface-raised p-6 shadow-soft ring-1 ring-border-strong space-y-4">
             <div className="flex items-center gap-2 text-caption text-foreground-subtle">
               <CalendarClock className="size-3.5" />
               Souhrn rezervace
@@ -311,10 +311,10 @@ export function ReservationPicker({
 
             {selectedStart && selectedRange ? (
               <div className="space-y-1.5">
-                <div className="tnum text-[28px] font-bold tracking-tight leading-none">
-                  {selectedStart}
+                <div className="font-display text-[clamp(2rem,4vw,2.75rem)] leading-none tnum">
+                  <span className="text-primary">{selectedStart}</span>
                   <span className="text-foreground-subtle mx-1">–</span>
-                  {minToLabel(selectedRange.endMin)}
+                  <span>{minToLabel(selectedRange.endMin)}</span>
                 </div>
                 <div className="text-sm text-foreground-muted">
                   {dateLabel} · {courtName}
@@ -370,7 +370,7 @@ export function ReservationPicker({
           <fieldset
             disabled={!selectedStart}
             className={cn(
-              "space-y-5 rounded-2xl border border-border bg-surface-raised p-5 shadow-sm transition",
+              "space-y-5 rounded-3xl bg-surface-raised p-6 shadow-soft ring-1 ring-border transition",
               !selectedStart && "opacity-60",
             )}
           >

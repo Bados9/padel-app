@@ -199,34 +199,52 @@ export default async function CourtDetailPage({
           Všechny kurty
         </Link>
 
-        <div className="rounded-2xl border border-border bg-surface-raised p-5 shadow-sm">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <div className="text-caption text-foreground-subtle">
-                Krok 2 z 2
-              </div>
-              <h1 className="text-h1 mt-1">{court.name}</h1>
-              {court.description ? (
-                <p className="text-sm text-foreground-muted mt-1 max-w-2xl">
-                  {court.description}
-                </p>
-              ) : null}
-              <div className="flex flex-wrap gap-1.5 pt-3">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
-                  {court.indoor ? (
-                    <>
-                      <Home className="size-3" /> Krytý
-                    </>
-                  ) : (
-                    <>
-                      <Sun className="size-3" /> Venkovní
-                    </>
-                  )}
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
-                  <Layers className="size-3" />
-                  {SURFACE_LABEL[court.surface]}
-                </span>
+        <div className="relative overflow-hidden rounded-3xl bg-surface-raised shadow-soft ring-1 ring-border">
+          <div
+            className="absolute inset-x-0 top-0 h-24"
+            style={{ background: court.indoor ? "#1E40AF" : "#6BB6FF" }}
+            aria-hidden
+          >
+            <svg
+              viewBox="0 0 1200 96"
+              preserveAspectRatio="none"
+              className="absolute inset-0 h-full w-full opacity-70"
+              aria-hidden
+            >
+              <rect x="40" y="16" width="1120" height="64" fill="none" stroke="#fff" strokeWidth="1.6" />
+              <line x1="600" y1="16" x2="600" y2="80" stroke="#fff" strokeWidth="1.6" />
+              <line x1="40" y1="48" x2="1160" y2="48" stroke="#fff" strokeWidth="1.4" />
+            </svg>
+          </div>
+          <div className="relative p-6 pt-16">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="text-caption text-white/90 drop-shadow">
+                  Krok 2 z 2
+                </div>
+                <h1 className="text-h1 mt-1">{court.name}</h1>
+                {court.description ? (
+                  <p className="text-sm text-foreground-muted mt-1 max-w-2xl">
+                    {court.description}
+                  </p>
+                ) : null}
+                <div className="flex flex-wrap gap-1.5 pt-3">
+                  <span className="pill inline-flex items-center gap-1.5 bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
+                    {court.indoor ? (
+                      <>
+                        <Home className="size-3" /> Krytý
+                      </>
+                    ) : (
+                      <>
+                        <Sun className="size-3" /> Venkovní
+                      </>
+                    )}
+                  </span>
+                  <span className="pill inline-flex items-center gap-1.5 bg-surface-sunken px-2.5 py-1 text-xs font-medium text-foreground-muted">
+                    <Layers className="size-3" />
+                    {SURFACE_LABEL[court.surface]}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

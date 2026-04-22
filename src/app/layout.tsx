@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Anton } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -14,8 +14,15 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+const anton = Anton({
+  variable: "--font-display-ui",
+  weight: "400",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Padel – rezervační systém",
+  title: "Hraj:Padel – rezervační systém",
   description: "Rezervace padelových kurtů a hledání spoluhráčů",
 };
 
@@ -25,7 +32,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="cs" className={`${inter.variable} ${jetbrains.variable}`}>
+    <html
+      lang="cs"
+      className={`${inter.variable} ${jetbrains.variable} ${anton.variable}`}
+    >
       <body className="antialiased">{children}</body>
     </html>
   );

@@ -1,27 +1,16 @@
 import Link from "next/link";
-import { CircleDot, CalendarClock, Users, UserRound, Shield } from "lucide-react";
+import { CalendarClock, Users, UserRound, Shield } from "lucide-react";
 import { auth, signOut } from "@/lib/auth";
-import { buttonVariants } from "@/components/ui/button";
+import { BrandLockup } from "@/components/layout/logo";
 
 export async function TopBar() {
   const session = await auth();
   const isAdmin = session?.user?.role === "ADMIN";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/75 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2.5 sm:h-16 sm:py-0">
-        <Link
-          href="/"
-          className="group flex items-center gap-2 font-semibold tracking-tight shrink-0"
-        >
-          <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm shadow-primary/30 transition-transform group-hover:-rotate-6">
-            <CircleDot className="size-4" />
-          </span>
-          <span className="text-base">
-            Padel
-            <span className="text-foreground-muted">.klub</span>
-          </span>
-        </Link>
+    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:h-16 sm:py-0">
+        <BrandLockup size={36} />
 
         <nav className="flex items-center gap-0.5 text-sm flex-wrap">
           <NavPill href="/rezervace" icon={<CalendarClock className="size-3.5" />}>
@@ -39,15 +28,19 @@ export async function TopBar() {
             </NavPill>
           ) : null}
 
-          <div className="ml-1 flex items-center gap-1">
+          <div className="ml-2 flex items-center gap-2">
             {session?.user ? (
               <>
                 <Link
                   href="/profil"
-                  className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-foreground-muted hover:bg-surface-sunken hover:text-foreground transition"
+                  className="flex items-center gap-2 rounded-full border border-border px-2.5 py-1.5 text-foreground-muted hover:border-primary hover:text-primary transition"
                 >
-                  <UserRound className="size-3.5" />
-                  <span className="max-w-[120px] truncate">{session.user.name}</span>
+                  <span className="grid size-6 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                    {initials(session.user.name)}
+                  </span>
+                  <span className="max-w-[120px] truncate text-xs font-medium">
+                    {session.user.name}
+                  </span>
                 </Link>
                 <form
                   action={async () => {
@@ -57,7 +50,7 @@ export async function TopBar() {
                 >
                   <button
                     type="submit"
-                    className="rounded-md px-2.5 py-1.5 text-xs text-foreground-subtle hover:bg-surface-sunken hover:text-foreground transition"
+                    className="rounded-md px-2.5 py-1.5 text-xs text-foreground-subtle hover:text-foreground transition"
                   >
                     Odhlásit
                   </button>
@@ -67,13 +60,13 @@ export async function TopBar() {
               <>
                 <Link
                   href="/login"
-                  className="rounded-md px-3 py-1.5 text-sm font-medium text-foreground-muted hover:bg-surface-sunken hover:text-foreground transition"
+                  className="rounded-md px-3 py-1.5 text-sm font-medium text-foreground-muted hover:text-primary transition"
                 >
                   Přihlásit
                 </Link>
                 <Link
                   href="/register"
-                  className={buttonVariants({ size: "sm" })}
+                  className="inline-flex items-center rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary-hover transition"
                 >
                   Registrace
                 </Link>
@@ -104,4 +97,12 @@ function NavPill({
       {children}
     </Link>
   );
+}
+
+function initials(name?: string | null) {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase() || "?";
 }

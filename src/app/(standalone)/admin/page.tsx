@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { Card, CardContent } from "@/components/ui/card";
 import { formatDateTimeCZ, formatTimeCZ, todayInClubTz, clubLocalToUtc } from "@/lib/time";
 
-export const metadata = { title: "Admin · Padel klub" };
+export const metadata = { title: "Admin · Hraj:Padel" };
 
 export default async function AdminDashboardPage() {
   const today = todayInClubTz();
@@ -55,39 +54,49 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight">Přehled klubu</h1>
+      <header className="space-y-1">
+        <div className="text-caption">Admin · Přehled</div>
+        <h1 className="text-h1">Přehled klubu</h1>
+      </header>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Stat label="Aktivní kurty" value={courtsCount} />
-        <Stat label="Rezervace dnes" value={todayReservations} />
-        <Stat label="Rezervace tento týden" value={weekReservations} />
+        <Stat label="Rezervace dnes" value={todayReservations} accent />
+        <Stat label="Tento týden" value={weekReservations} />
         <Stat label="Otevřené hry" value={openGames} />
         <Stat label="Uživatelé" value={usersCount} />
       </div>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Nejbližší rezervace</h2>
+      <section className="rounded-3xl bg-surface-raised p-6 shadow-softer ring-1 ring-border space-y-4">
+        <div className="flex items-baseline justify-between">
+          <h2 className="font-display text-2xl">Nejbližší rezervace</h2>
+          <Link
+            href="/admin/rezervace"
+            className="text-xs font-semibold text-primary hover:underline"
+          >
+            Všechny →
+          </Link>
+        </div>
         {nextReservations.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Žádné nadcházející rezervace.</p>
+          <p className="text-sm text-foreground-muted">Žádné nadcházející rezervace.</p>
         ) : (
           <div className="grid gap-2">
             {nextReservations.map((r) => (
-              <Card key={r.id} size="sm">
-                <CardContent className="pt-3 flex items-center justify-between gap-3 flex-wrap">
-                  <div className="space-y-0.5">
-                    <div className="font-medium">{r.court.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {formatDateTimeCZ(r.startAt)} – {formatTimeCZ(r.endAt)} · {r.owner.name}
-                    </div>
+              <Link
+                key={r.id}
+                href="/admin/rezervace"
+                className="group flex items-center justify-between gap-3 rounded-2xl border border-border bg-background px-4 py-3 transition hover:border-primary hover:bg-primary-soft"
+              >
+                <div className="space-y-0.5">
+                  <div className="font-semibold group-hover:text-primary transition">{r.court.name}</div>
+                  <div className="text-xs text-foreground-subtle tnum">
+                    {formatDateTimeCZ(r.startAt)} – {formatTimeCZ(r.endAt)} · {r.owner.name}
                   </div>
-                  <Link
-                    href="/admin/rezervace"
-                    className="text-xs text-muted-foreground hover:underline"
-                  >
-                    Detail →
-                  </Link>
-                </CardContent>
-              </Card>
+                </div>
+                <span className="text-xs font-semibold text-foreground-subtle group-hover:text-primary transition">
+                  Detail →
+                </span>
+              </Link>
             ))}
           </div>
         )}
@@ -96,15 +105,27 @@ export default async function AdminDashboardPage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number;
+  accent?: boolean;
+}) {
   return (
-    <Card>
-      <CardContent className="pt-4">
-        <div className="text-xs uppercase tracking-wide text-muted-foreground">
-          {label}
-        </div>
-        <div className="text-2xl font-bold">{value}</div>
-      </CardContent>
-    </Card>
+    <div
+      className={
+        accent
+          ? "rounded-2xl bg-accent p-4 text-accent-foreground shadow-soft"
+          : "rounded-2xl bg-surface-raised p-4 shadow-softer ring-1 ring-border"
+      }
+    >
+      <div className="text-[10px] font-mono uppercase tracking-[0.08em] opacity-70">
+        {label}
+      </div>
+      <div className="mt-1 font-display text-3xl leading-none tnum">{value}</div>
+    </div>
   );
 }

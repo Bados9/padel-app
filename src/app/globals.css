@@ -19,8 +19,13 @@
   --color-primary-hover: var(--primary-hover);
   --color-primary-soft: var(--primary-soft);
 
+  --color-court: var(--court);
+  --color-court-soft: var(--court-soft);
+  --color-court-strong: var(--court-strong);
+
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
 
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
@@ -33,6 +38,7 @@
 
   --font-sans: var(--font-sans-ui), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-mono-ui), ui-monospace, SFMono-Regular, "Menlo", "Consolas", monospace;
+  --font-display: var(--font-display-ui), "Anton", Impact, "Helvetica Neue", sans-serif;
   --font-heading: var(--font-sans-ui), ui-sans-serif, system-ui, sans-serif;
 
   --color-sidebar-ring: var(--sidebar-ring);
@@ -70,45 +76,49 @@
 }
 
 :root {
-  /* Surface ladder – warm off-white, ne ploché bílé */
-  --background:        oklch(0.985 0.004 95);
-  --surface-sunken:    oklch(0.955 0.006 95);
-  --surface-raised:    oklch(1     0     0);
-  --surface-overlay:   oklch(0.99  0.003 95);
-  --foreground:        oklch(0.14  0.015 250);   /* ztmaveno pro víc přítomnosti */
-  --foreground-muted:  oklch(0.38  0.015 250);   /* výraznější sekundární text */
-  --foreground-subtle: oklch(0.54  0.012 250);   /* terciér, ale pořád čitelný */
-  --border:            oklch(0.88  0.006 95);    /* silnější hairline */
-  --border-strong:     oklch(0.80  0.007 95);
+  /* Surface ladder – cool paper, lehce modravá */
+  --background:        #F8FAFC;
+  --surface-sunken:    #EEF2F7;
+  --surface-raised:    #FFFFFF;
+  --surface-overlay:   #FFFFFF;
+  --foreground:        #0F172A;
+  --foreground-muted:  #334155;
+  --foreground-subtle: #64748B;
+  --border:            #E2E8F0;
+  --border-strong:     #CBD5E1;
 
-  /* Brand – padel court green */
-  --primary:            oklch(0.62  0.17  155);
-  --primary-hover:      oklch(0.56  0.18  155);
-  --primary-foreground: oklch(0.99  0     0);
-  --primary-soft:       oklch(0.95  0.05  155);
+  /* Brand – padel court blue */
+  --court-soft:         #DCEBFE;   /* court/100 */
+  --court:              #6BB6FF;   /* court/400 – hero/decor */
+  --court-strong:       #1E40AF;   /* court/700 – CTA/primary */
+  --primary:            #1E40AF;
+  --primary-hover:      #1E3A8A;
+  --primary-foreground: #FFFFFF;
+  --primary-soft:       #DCEBFE;
 
-  /* Accent – lime zip (použít sparingly) */
-  --accent:            oklch(0.88  0.20  120);
-  --accent-foreground: oklch(0.20  0.02  140);
+  /* Accent – ball lime */
+  --accent:             #D4ED4C;
+  --accent-soft:        #EAF6A6;
+  --accent-foreground:  #0F172A;
 
   /* Secondary / muted */
-  --secondary:            oklch(0.96  0.005 95);
-  --secondary-foreground: oklch(0.22  0.015 250);
+  --secondary:            #F1F5F9;
+  --secondary-foreground: #0F172A;
   --muted:                var(--surface-sunken);
   --muted-foreground:     var(--foreground-muted);
 
   /* Status */
-  --success:      oklch(0.52 0.16 155);
-  --success-soft: oklch(0.95 0.05 155);
-  --warning:      oklch(0.48 0.16 65);   /* ztmaveno kvůli kontrastu na warning-soft */
-  --warning-soft: oklch(0.96 0.06 90);
-  --danger:       oklch(0.55 0.22 25);
-  --danger-soft:  oklch(0.96 0.04 25);
-  --info:         oklch(0.52 0.14 230);
-  --info-soft:    oklch(0.95 0.03 230);
+  --success:      #16A34A;
+  --success-soft: #DCFCE7;
+  --warning:      #B45309;
+  --warning-soft: #FEF3C7;
+  --danger:       #B91C1C;
+  --danger-soft:  #FEE2E2;
+  --info:         #1E40AF;
+  --info-soft:    #DCEBFE;
   --destructive:  var(--danger);
 
-  --radius: 0.75rem;
+  --radius: 0.875rem;
 
   /* shadcn bridge */
   --card:               var(--surface-raised);
@@ -116,13 +126,13 @@
   --popover:            var(--surface-overlay);
   --popover-foreground: var(--foreground);
   --input:              var(--border);
-  --ring:               var(--primary);
+  --ring:               var(--court-strong);
 
-  --chart-1: oklch(0.62 0.17 155);
-  --chart-2: oklch(0.60 0.14 230);
-  --chart-3: oklch(0.78 0.15 75);
-  --chart-4: oklch(0.58 0.22 25);
-  --chart-5: oklch(0.52 0.08 250);
+  --chart-1: #1E40AF;
+  --chart-2: #6BB6FF;
+  --chart-3: #D4ED4C;
+  --chart-4: #B91C1C;
+  --chart-5: #64748B;
 
   --sidebar:                     var(--surface-raised);
   --sidebar-foreground:          var(--foreground);
@@ -135,37 +145,41 @@
 }
 
 .dark {
-  --background:        oklch(0.145 0.012 250);
-  --surface-sunken:    oklch(0.175 0.012 250);
-  --surface-raised:    oklch(0.215 0.013 250);
-  --surface-overlay:   oklch(0.245 0.014 250);
-  --foreground:        oklch(0.98  0.004 95);
-  --foreground-muted:  oklch(0.80  0.010 250);
-  --foreground-subtle: oklch(0.65  0.012 250);
-  --border:            oklch(1 0 0 / 0.12);
-  --border-strong:     oklch(1 0 0 / 0.22);
+  --background:        #0B1220;
+  --surface-sunken:    #111A2E;
+  --surface-raised:    #162239;
+  --surface-overlay:   #1B2B47;
+  --foreground:        #F8FAFC;
+  --foreground-muted:  #CBD5E1;
+  --foreground-subtle: #94A3B8;
+  --border:            rgba(255,255,255,0.10);
+  --border-strong:     rgba(255,255,255,0.22);
 
-  --primary:            oklch(0.72 0.18 155);
-  --primary-hover:      oklch(0.78 0.18 155);
-  --primary-foreground: oklch(0.12 0.015 250);
-  --primary-soft:       oklch(0.72 0.18 155 / 0.14);
+  --court-soft:         rgba(107,182,255,0.18);
+  --court:              #6BB6FF;
+  --court-strong:       #6BB6FF;
+  --primary:            #6BB6FF;
+  --primary-hover:      #8FBCF9;
+  --primary-foreground: #0F172A;
+  --primary-soft:       rgba(107,182,255,0.18);
 
-  --accent:             oklch(0.86 0.19 120);
-  --accent-foreground:  oklch(0.18 0.02 140);
+  --accent:             #D4ED4C;
+  --accent-soft:        rgba(212,237,76,0.22);
+  --accent-foreground:  #0F172A;
 
-  --secondary:            oklch(0.22 0.013 250);
-  --secondary-foreground: oklch(0.97 0.004 95);
+  --secondary:            #1B2B47;
+  --secondary-foreground: #F8FAFC;
   --muted:                var(--surface-sunken);
   --muted-foreground:     var(--foreground-muted);
 
-  --success:      oklch(0.72 0.17 155);
-  --success-soft: oklch(0.72 0.17 155 / 0.15);
-  --warning:      oklch(0.80 0.15 75);
-  --warning-soft: oklch(0.80 0.15 75 / 0.15);
-  --danger:       oklch(0.70 0.20 25);
-  --danger-soft:  oklch(0.70 0.20 25 / 0.15);
-  --info:         oklch(0.72 0.13 230);
-  --info-soft:    oklch(0.72 0.13 230 / 0.15);
+  --success:      #22C55E;
+  --success-soft: rgba(34,197,94,0.18);
+  --warning:      #EAB308;
+  --warning-soft: rgba(234,179,8,0.18);
+  --danger:       #F87171;
+  --danger-soft:  rgba(248,113,113,0.18);
+  --info:         #6BB6FF;
+  --info-soft:    rgba(107,182,255,0.18);
   --destructive:  var(--danger);
 
   --card:               var(--surface-raised);
@@ -174,12 +188,6 @@
   --popover-foreground: var(--foreground);
   --input:              var(--border);
   --ring:               var(--primary);
-
-  --chart-1: oklch(0.72 0.18 155);
-  --chart-2: oklch(0.72 0.13 230);
-  --chart-3: oklch(0.80 0.15 75);
-  --chart-4: oklch(0.70 0.20 25);
-  --chart-5: oklch(0.72 0.05 250);
 
   --sidebar:                     var(--surface-raised);
   --sidebar-foreground:          var(--foreground);
@@ -211,69 +219,99 @@
     font-weight: 400;
   }
 
-  /* Měkký default pro odkazy v textovém toku */
   strong, b {
     font-weight: 600;
   }
 
-  /* Tabular numerals pro časy, čísla v listech */
   .tnum {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1, "cv11" 1;
   }
 
-  /* Focus ring default – zdědí rounded od cíle, takže nenaruší velké karty */
   :where(button, a, input, select, textarea, [role="button"]):focus-visible {
     @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
     border-radius: inherit;
   }
 
-  /* Selection */
   ::selection {
-    background-color: var(--primary-soft);
-    color: var(--primary);
+    background-color: var(--accent);
+    color: var(--accent-foreground);
   }
 }
 
 @layer utilities {
+  /* Display typografie – Anton condensed uppercase */
+  .font-display {
+    font-family: var(--font-display-ui), "Anton", Impact, "Helvetica Neue", sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
   .text-display {
-    font-size: clamp(2.75rem, 6vw, 4.5rem);
-    line-height: 1.05;
-    letter-spacing: -0.035em;
-    font-weight: 800;
+    font-family: var(--font-display-ui), "Anton", Impact, "Helvetica Neue", sans-serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    font-weight: 400;
   }
 
   .text-h1 {
-    font-size: clamp(1.875rem, 3.5vw, 2.5rem);
-    line-height: 1.15;
-    letter-spacing: -0.025em;
-    font-weight: 700;
+    font-family: var(--font-display-ui), "Anton", Impact, sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    font-weight: 400;
   }
 
   .text-h2 {
-    font-size: 1.75rem;
-    line-height: 1.25;
-    letter-spacing: -0.02em;
-    font-weight: 700;
+    font-family: var(--font-display-ui), "Anton", Impact, sans-serif;
+    font-size: 1.875rem;
+    line-height: 1.05;
+    letter-spacing: 0.015em;
+    text-transform: uppercase;
+    font-weight: 400;
   }
 
   .text-h3 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     line-height: 1.3;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
     font-weight: 600;
   }
 
+  /* Mono caption – nad-karty/labely jako ve showcase */
   .text-caption {
-    font-size: 0.75rem;
+    font-family: var(--font-mono-ui), ui-monospace, monospace;
+    font-size: 0.6875rem;
     line-height: 1.3;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    font-weight: 700;
-    color: var(--foreground-muted);
+    font-weight: 500;
+    color: var(--foreground-subtle);
   }
 
-  /* Pattern: diagonal stripes pro "obsazeno" */
+  /* Soft card shadow */
+  .shadow-soft {
+    box-shadow:
+      0 1px 2px rgba(15,23,42,.04),
+      0 8px 24px -12px rgba(15,23,42,.12);
+  }
+
+  .shadow-softer {
+    box-shadow:
+      0 1px 2px rgba(15,23,42,.04),
+      0 4px 12px -6px rgba(15,23,42,.08);
+  }
+
+  /* Hero gradient do strany modra */
+  .court-grad {
+    background: linear-gradient(135deg, #6BB6FF 0%, #4A90E2 55%, #1E40AF 100%);
+  }
+
+  /* Obsazeno proužky */
   .bg-stripes {
     background-image: repeating-linear-gradient(
       135deg,
@@ -281,4 +319,7 @@
       color-mix(in oklab, var(--foreground) 10%, transparent) 6px 7px
     );
   }
+
+  /* Pill – 100% kulaté */
+  .pill { border-radius: 9999px; }
 }

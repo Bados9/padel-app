@@ -10,7 +10,7 @@ import {
 } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 
-export const metadata = { title: "Otevřené hry · Padel klub" };
+export const metadata = { title: "Otevřené hry · Hraj:Padel" };
 
 const LEVELS = ["BEGINNER", "INTERMEDIATE", "ADVANCED", "PRO"] as const;
 
@@ -42,13 +42,22 @@ export default async function GamesListPage({ searchParams }: PageProps) {
   });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 space-y-8">
-      <header className="space-y-2">
-        <div className="text-caption text-foreground-subtle">Matchmaking</div>
-        <h1 className="text-h1">Otevřené hry</h1>
-        <p className="text-foreground-muted max-w-xl">
-          Přidej se k rezervaci jiného hráče – padel se hraje ve čtyřech.
-        </p>
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14 space-y-8">
+      <header className="flex items-end justify-between gap-4 flex-wrap">
+        <div className="space-y-2">
+          <div className="text-caption">06 — Matchmaking</div>
+          <h1 className="text-h1">Otevřené hry</h1>
+          <p className="text-foreground-muted max-w-xl">
+            Přidej se k rezervaci jiného hráče – padel se hraje ve čtyřech.
+          </p>
+        </div>
+        <Link
+          href="/rezervace"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground shadow-sm hover:-translate-y-0.5 transition"
+        >
+          <UsersRound className="size-4" />
+          Založit vlastní hru
+        </Link>
       </header>
 
       {/* Filter */}
@@ -68,7 +77,7 @@ export default async function GamesListPage({ searchParams }: PageProps) {
       </div>
 
       {games.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-surface-sunken/50 p-8 text-center space-y-2">
+        <div className="rounded-3xl border border-dashed border-border bg-surface-raised p-10 text-center space-y-3 shadow-soft">
           <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-surface-raised text-foreground-muted">
             <UsersRound className="size-6" />
           </div>
@@ -99,11 +108,11 @@ export default async function GamesListPage({ searchParams }: PageProps) {
               <Link
                 key={g.id}
                 href={`/hry/${g.id}`}
-                className="group grid gap-3 rounded-2xl border border-border bg-surface-raised p-5 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40 sm:grid-cols-[auto_1fr_auto] sm:items-center"
+                className="group grid gap-4 rounded-3xl bg-surface-raised p-5 shadow-soft ring-1 ring-border transition hover:shadow-md hover:-translate-y-0.5 hover:ring-primary/30 sm:grid-cols-[auto_1fr_auto] sm:items-center"
               >
                 {/* Time column */}
-                <div className="flex sm:flex-col sm:items-center sm:justify-center gap-2 sm:min-w-[110px]">
-                  <div className="tnum text-lg font-bold leading-none">
+                <div className="flex sm:flex-col sm:items-center sm:justify-center gap-2 sm:min-w-[120px] sm:rounded-2xl sm:bg-primary-soft sm:py-3 sm:px-4 sm:text-primary">
+                  <div className="font-display text-3xl leading-none tnum">
                     {formatTimeCZ(g.startAt)}
                   </div>
                   <div className="text-xs text-foreground-subtle sm:text-center">

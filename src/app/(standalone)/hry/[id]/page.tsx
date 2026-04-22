@@ -59,34 +59,49 @@ export default async function GameDetailPage({ params }: PageProps) {
       </Link>
 
       {/* Hero card */}
-      <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-primary-soft p-6 shadow-sm">
-        <div
+      <div className="relative overflow-hidden rounded-3xl court-grad p-6 sm:p-8 shadow-soft text-white">
+        <svg
+          viewBox="0 0 700 220"
+          preserveAspectRatio="none"
           aria-hidden
-          className="pointer-events-none absolute -right-10 -top-10 size-48 rounded-full bg-primary/20 blur-2xl"
-        />
+          className="absolute inset-0 h-full w-full opacity-55"
+        >
+          <rect x="40" y="30" width="620" height="160" fill="none" stroke="#fff" strokeWidth="2.5" />
+          <line x1="350" y1="30" x2="350" y2="190" stroke="#fff" strokeWidth="2.5" />
+          <line x1="40" y1="110" x2="660" y2="110" stroke="#fff" strokeWidth="2" />
+        </svg>
+        <svg
+          width="90"
+          height="90"
+          viewBox="0 0 90 90"
+          aria-hidden
+          className="absolute -bottom-3 -right-3 drop-shadow"
+        >
+          <circle cx="45" cy="45" r="40" fill="#D4ED4C" />
+          <path d="M10 36 C22 62, 66 28, 80 54" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" />
+        </svg>
         <div className="relative space-y-3">
-          <div className="text-caption text-primary">Otevřená hra</div>
-          <div className="tnum text-h1 leading-none">
+          <div className="text-[11px] font-mono uppercase tracking-[0.08em] text-white/85">
+            Otevřená hra · {totalPlayers}/4
+          </div>
+          <div className="font-display text-[clamp(2.5rem,6vw,4rem)] leading-none tnum">
             {formatTimeCZ(game.startAt)}
-            <span className="text-foreground-muted mx-1">–</span>
+            <span className="text-white/60 mx-1">–</span>
             {formatTimeCZ(game.endAt)}
           </div>
-          <p className="text-sm text-foreground-muted">
+          <p className="text-sm text-white/85">
             {formatDateCZ(game.startAt)}
-            {rel ? <span className="text-primary font-medium"> · {rel}</span> : null}
+            {rel ? <span className="font-semibold text-accent"> · {rel}</span> : null}
           </p>
-          <div className="flex flex-wrap gap-1.5 pt-1">
+          <div className="flex flex-wrap gap-1.5 pt-2">
             <Link
               href={`/rezervace/${game.court.id}`}
-              className="inline-flex items-center rounded-full bg-surface-raised px-3 py-1 text-sm font-medium hover:bg-surface-sunken transition"
+              className="pill inline-flex items-center bg-white px-3 py-1 text-sm font-semibold text-primary hover:-translate-y-0.5 transition"
             >
               {game.court.name}
             </Link>
-            <span className="inline-flex items-center rounded-full bg-surface-raised px-3 py-1 text-sm font-medium">
-              {totalPlayers}/4 hráčů
-            </span>
             {game.preferredLevel ? (
-              <span className="inline-flex items-center rounded-full bg-surface-raised px-3 py-1 text-sm font-medium">
+              <span className="pill inline-flex items-center bg-accent px-3 py-1 text-sm font-bold text-accent-foreground">
                 {LEVEL_LABEL[game.preferredLevel]}
               </span>
             ) : null}
@@ -102,16 +117,16 @@ export default async function GameDetailPage({ params }: PageProps) {
       ) : null}
 
       {game.notes ? (
-        <div className="rounded-2xl border border-border bg-surface-raised p-4">
-          <p className="text-sm italic text-foreground-muted">
+        <div className="rounded-3xl bg-accent-soft p-5 ring-1 ring-accent/40">
+          <p className="text-sm italic text-accent-foreground">
             „{game.notes}“
           </p>
         </div>
       ) : null}
 
       {/* Players */}
-      <div className="rounded-2xl border border-border bg-surface-raised p-5 shadow-sm space-y-3">
-        <h2 className="text-h3">Hráči</h2>
+      <div className="rounded-3xl bg-surface-raised p-6 shadow-soft ring-1 ring-border space-y-4">
+        <h2 className="font-display text-2xl">Hráči</h2>
         <ul className="space-y-1.5">
           <PlayerRow
             name={game.owner.name}

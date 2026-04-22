@@ -13,7 +13,7 @@ import { LEVEL_LABEL, playersLabel, relativeTimeCs } from "@/lib/labels";
 import { CancelButton } from "@/components/reservations/cancel-button";
 import { JoinLeaveButton } from "@/components/reservations/join-leave-button";
 
-export const metadata = { title: "Moje rezervace · Padel klub" };
+export const metadata = { title: "Moje rezervace · Hraj:Padel" };
 
 type PageProps = {
   searchParams: Promise<{ created?: string }>;
@@ -69,12 +69,12 @@ export default async function MyReservationsPage({ searchParams }: PageProps) {
   const next = combined[0];
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 space-y-8">
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14 space-y-8">
       <header className="space-y-1">
-        <div className="text-caption text-foreground-subtle">Přehled</div>
-        <h1 className="text-h1">Moje rezervace</h1>
+        <div className="text-caption">07 — Moje rezervace</div>
+        <h1 className="text-h1">Tvůj rozpis</h1>
         <p className="text-sm text-foreground-muted">
-          Tvoje termíny, hry kde jsi host, a historie.
+          Nadcházející termíny, hry kde jsi host, a historie.
         </p>
       </header>
 
@@ -101,7 +101,7 @@ export default async function MyReservationsPage({ searchParams }: PageProps) {
 
       <section className="space-y-3">
         <h2 className="text-h2 flex items-center gap-2">
-          <CalendarClock className="size-5 text-foreground-muted" />
+          <CalendarClock className="size-5 text-primary" />
           Další termíny
         </h2>
         {combined.length <= 1 ? (
@@ -127,7 +127,7 @@ export default async function MyReservationsPage({ searchParams }: PageProps) {
       </section>
 
       {past.length > 0 ? (
-        <details className="group rounded-2xl border border-border bg-surface-raised p-5">
+        <details className="group rounded-3xl bg-surface-raised p-6 shadow-softer ring-1 ring-border">
           <summary className="flex cursor-pointer items-center justify-between gap-2 text-sm font-medium list-none">
             <span className="inline-flex items-center gap-2 text-foreground-muted group-open:text-foreground">
               <History className="size-4" />
@@ -192,44 +192,60 @@ function NextReservationCard({
 }) {
   const rel = relativeTimeCs(r.startAt);
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-primary-soft p-6 shadow-sm">
-      <div
+    <div className="relative overflow-hidden rounded-3xl court-grad p-6 sm:p-8 shadow-soft text-white">
+      <svg
+        viewBox="0 0 700 280"
+        preserveAspectRatio="none"
         aria-hidden
-        className="pointer-events-none absolute -right-10 -top-10 size-48 rounded-full bg-primary/20 blur-2xl"
-      />
-      <div className="relative space-y-4">
+        className="absolute inset-0 h-full w-full opacity-60"
+      >
+        <rect x="40" y="30" width="620" height="220" fill="none" stroke="#FFFFFF" strokeWidth="2.5" />
+        <line x1="350" y1="30" x2="350" y2="250" stroke="#FFFFFF" strokeWidth="2.5" />
+        <line x1="40" y1="140" x2="660" y2="140" stroke="#FFFFFF" strokeWidth="2" />
+      </svg>
+      <svg
+        width="90"
+        height="90"
+        viewBox="0 0 90 90"
+        aria-hidden
+        className="absolute -bottom-3 -right-3 drop-shadow"
+      >
+        <circle cx="45" cy="45" r="40" fill="#D4ED4C" />
+        <path d="M10 36 C22 62, 66 28, 80 54" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" />
+      </svg>
+      <div className="relative space-y-5">
         <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="space-y-1">
-            <div className="text-caption text-primary">Nejbližší</div>
-            <div className="tnum text-h1 text-foreground leading-none">
+          <div className="space-y-2">
+            <div className="text-[11px] font-mono uppercase tracking-[0.08em] text-white/85">Nejbližší</div>
+            <div className="font-display text-[clamp(2.5rem,6vw,4rem)] leading-none tnum">
               {formatTimeCZ(r.startAt)}
-              <span className="text-foreground-muted mx-1">–</span>
+              <span className="text-white/60 mx-1">–</span>
               {formatTimeCZ(r.endAt)}
             </div>
-            <p className="text-sm text-foreground-muted">
+            <p className="text-sm text-white/85">
               {formatDateCZ(r.startAt)}
-              {rel ? <span className="text-primary font-medium"> · {rel}</span> : null}
+              {rel ? <span className="font-semibold text-accent"> · {rel}</span> : null}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             {kind === "guest" ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-info-soft px-2.5 py-1 text-xs font-medium text-info">
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
                 <UsersRound className="size-3" />
                 host u {ownerName}
               </span>
             ) : r.visibility === "PUBLIC" ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-accent/40 px-2.5 py-1 text-xs font-medium text-accent-foreground">
+              <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-accent-foreground">
                 otevřená
               </span>
             ) : null}
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-4 flex-wrap border-t border-primary/20 pt-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap border-t border-white/30 pt-4">
           <Link
             href={`/rezervace/${r.court.id}`}
-            className="font-semibold hover:underline"
+            className="font-semibold hover:underline text-white"
           >
             {r.court.name}
           </Link>
@@ -243,7 +259,7 @@ function NextReservationCard({
         </div>
 
         {r.visibility === "PUBLIC" && kind === "owner" ? (
-          <p className="text-xs text-foreground-subtle">
+          <p className="text-xs text-white/80">
             Hledáš {playersLabel(r.neededPlayers)}
             {r.preferredLevel
               ? ` · úroveň ${LEVEL_LABEL[r.preferredLevel]}`
@@ -252,7 +268,7 @@ function NextReservationCard({
         ) : null}
 
         {r.notes ? (
-          <p className="text-xs italic text-foreground-muted">„{r.notes}“</p>
+          <p className="text-xs italic text-white/80">„{r.notes}“</p>
         ) : null}
       </div>
     </div>
@@ -269,7 +285,7 @@ function ReservationRow({
   ownerName?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-surface-raised p-4 flex items-start justify-between gap-4 flex-wrap">
+    <div className="rounded-2xl bg-surface-raised p-4 shadow-softer ring-1 ring-border flex items-start justify-between gap-4 flex-wrap">
       <div className="space-y-1">
         <div className="flex items-center gap-2 flex-wrap">
           <Link
@@ -313,7 +329,7 @@ function ReservationRow({
 
 function EmptyHero() {
   return (
-    <div className="rounded-2xl border border-dashed border-border bg-surface-sunken/50 p-8 text-center space-y-3">
+    <div className="rounded-3xl border border-dashed border-border bg-surface-raised p-10 text-center space-y-3 shadow-soft">
       <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-surface-raised text-foreground-muted">
         <CalendarClock className="size-6" />
       </div>

@@ -12,8 +12,8 @@ export default function StandaloneLayout({
     <div className="flex min-h-screen flex-col">
       <TopBar />
       <main className="flex-1">{children}</main>
-      <footer className="border-t py-4 text-center text-xs text-muted-foreground">
-        Padel klub · prototyp · {new Date().getFullYear()}
+      <footer className="border-t border-border py-6 text-center text-[11px] font-mono uppercase tracking-[0.08em] text-foreground-subtle">
+        HRAJ:PADEL · PROTOTYP · {new Date().getFullYear()}
       </footer>
       <Toaster richColors closeButton />
     </div>
