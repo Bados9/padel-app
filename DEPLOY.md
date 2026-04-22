@@ -161,25 +161,28 @@ cd /var/www/padel-app
 
 ## Auto-deploy přes GitHub Actions
 
-Workflow `.github/workflows/deploy.yml` je připravený, ale potřebuje 5 secrets
-na `Bados9/padel-app` → Settings → Secrets and variables → Actions:
+Workflow `.github/workflows/deploy.yml` je připravený, ale potřebuje 4 secrets
+na `Bados9/padel-app` → Settings → Secrets and variables → Actions.
+**Naming je sladěný s pivnikonto repem** (stejná pojmenovací konvence):
 
 | Secret | Hodnota | Poznámka |
 |---|---|---|
-| `VPS_HOST` | `46.225.59.170` | Stejné jako pivnikonto |
-| `VPS_USER` | `root` | Stejné jako pivnikonto |
-| `VPS_PORT` | `22` nebo custom | Volitelný, default 22 |
-| `VPS_PATH` | `/var/www/padel-app` | Kam je repo naklonováno na VPS |
-| `VPS_SSH_KEY` | **Privátní** SSH klíč (celý PEM včetně BEGIN/END řádků) | Stejný klíč jako pivnikonto `SSH_PRIVATE_KEY`, nebo nový deploy key |
+| `SSH_HOST` | `46.225.59.170` | Stejné jako pivnikonto |
+| `SSH_USER` | `padel` | Samostatný linux user (izolace od pivnikonto) |
+| `SSH_PORT` | `22` | Dle konfigurace VPS |
+| `SSH_PRIVATE_KEY` | **Privátní** SSH klíč (celý PEM včetně BEGIN/END řádků) | Deploy key pod userem `padel` |
 
-**Pokud používáš stejný SSH klíč jako pivnikonto**, stačí zkopírovat hodnotu
-z `Bados9/pivni-konto` → Secrets → `SSH_PRIVATE_KEY`.
+Deploy path je hardcoded ve workflow (`/home/padel/padel-app`), stejný pattern
+jako pivnikonto (`/var/www/pivnikonto`).
 
-**Nebo vygeneruj nový deploy key** (doporučeno, izolace):
+**Vygeneruj deploy key pod uživatelem `padel` přímo na VPS**:
 ```bash
-ssh-keygen -t ed25519 -C "padel-deploy" -f padel_deploy -N ""
-# Pub: přidej do /root/.ssh/authorized_keys na VPS
-# Priv: nahraj jako VPS_SSH_KEY secret
+ssh root@46.225.59.170
+su - padel
+ssh-keygen -t ed25519 -C "padel-deploy@github-actions" -f ~/.ssh/padel_deploy -N ""
+cat ~/.ssh/padel_deploy.pub >> ~/.ssh/authorized_keys
+chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
+cat ~/.ssh/padel_deploy    # celý výstup nahraj jako SSH_PRIVATE_KEY secret
 ```
 
 Po přidání secrets: další push do `main` spustí CI. Sleduj na:

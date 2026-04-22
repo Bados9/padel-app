@@ -28,17 +28,17 @@ jobs:
   deploy:
     needs: verify
     runs-on: ubuntu-latest
-    # Deploy jen když je nastavený VPS_HOST secret.
+    # Deploy běží jen na push do main / ruční spuštění – ne na pull_request.
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     steps:
       - name: SSH deploy
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            cd ${{ secrets.VPS_PATH }}
+            cd /home/padel/padel-app
             DEPLOY_REF=origin/main ./scripts/deploy.sh
