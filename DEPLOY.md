@@ -66,20 +66,29 @@ AUTH_SECRET=<base64 32 bytů>
 ### 3. Build + start kontejnerů
 
 ```bash
-./deploy.sh --with-seed
+./scripts/deploy.sh      # pull + build + up -d + healthcheck
+./scripts/seed-prod.sh   # POUZE PŘI PRVNÍM NASAZENÍ – vytvoří admina a kurty
 ```
 
-Skript:
-1. `git pull`
+`scripts/deploy.sh`:
+1. `git fetch + reset --hard origin/main` (cílový ref lze přepnout přes `DEPLOY_REF`)
 2. `docker compose -f docker-compose.prod.yml build`
 3. `... up -d --remove-orphans` → postgres → migrate (čeká healthcheck) → app
-4. s `--with-seed` naseeduje testovací účty:
-   - `admin@padel.local` / `admin123`
-   - `hrac@padel.local` / `hrac123`
+4. Healthcheck `curl http://127.0.0.1:3101/padel/` (do 60 s)
 
-Ověř:
+`scripts/seed-prod.sh` spustí Prisma seed v migrator kontejneru — bezpečné re-run
+(upsert), ale obvykle jen poprvé. Seeduje testovací účty:
+- `admin@padel.local` / `admin123`
+- `hrac@padel.local` / `hrac123`
+
+Další deploy už pak jen:
 ```bash
-curl -I http://127.0.0.1:3101/padel
+./scripts/deploy.sh
+```
+
+Ověření:
+```bash
+curl -I http://127.0.0.1:3101/padel/
 # → HTTP/1.1 200 OK (nebo 307 na login)
 ```
 
@@ -138,11 +147,43 @@ docker compose -f docker-compose.prod.yml up -d nginx   # reload
 
 ## Opakovaný deploy (update kódu)
 
+**Automaticky přes GitHub Actions** (doporučeno):
+- Každý merge do `main` spustí `.github/workflows/deploy.yml`:
+  `verify` job (typecheck + lint) → `deploy` job (SSH na VPS + `scripts/deploy.sh`)
+- Vyžaduje secrets v repu — viz níže sekce „Auto-deploy přes GitHub Actions".
+
+**Ručně na VPS** (fallback):
 ```bash
 ssh root@46.225.59.170
 cd /var/www/padel-app
-./deploy.sh
+./scripts/deploy.sh
 ```
+
+## Auto-deploy přes GitHub Actions
+
+Workflow `.github/workflows/deploy.yml` je připravený, ale potřebuje 5 secrets
+na `Bados9/padel-app` → Settings → Secrets and variables → Actions:
+
+| Secret | Hodnota | Poznámka |
+|---|---|---|
+| `VPS_HOST` | `46.225.59.170` | Stejné jako pivnikonto |
+| `VPS_USER` | `root` | Stejné jako pivnikonto |
+| `VPS_PORT` | `22` nebo custom | Volitelný, default 22 |
+| `VPS_PATH` | `/var/www/padel-app` | Kam je repo naklonováno na VPS |
+| `VPS_SSH_KEY` | **Privátní** SSH klíč (celý PEM včetně BEGIN/END řádků) | Stejný klíč jako pivnikonto `SSH_PRIVATE_KEY`, nebo nový deploy key |
+
+**Pokud používáš stejný SSH klíč jako pivnikonto**, stačí zkopírovat hodnotu
+z `Bados9/pivni-konto` → Secrets → `SSH_PRIVATE_KEY`.
+
+**Nebo vygeneruj nový deploy key** (doporučeno, izolace):
+```bash
+ssh-keygen -t ed25519 -C "padel-deploy" -f padel_deploy -N ""
+# Pub: přidej do /root/.ssh/authorized_keys na VPS
+# Priv: nahraj jako VPS_SSH_KEY secret
+```
+
+Po přidání secrets: další push do `main` spustí CI. Sleduj na:
+https://github.com/Bados9/padel-app/actions
 
 ## Troubleshooting
 
@@ -154,7 +195,7 @@ cd /var/www/padel-app
 
 **Migrace selhaly**
 - `docker logs padel-app-migrate` ukáže chybu.
-- Fix schématu → commit → `./deploy.sh` nebo ruční
+- Fix schématu → PR → merge → CI → deploy. V nouzi ručně:
   `docker compose -f docker-compose.prod.yml run --rm migrate`.
 
 **Heslo k DB**
@@ -166,7 +207,8 @@ docker compose -f docker-compose.prod.yml exec postgres psql -U padel
 ```bash
 docker compose -f docker-compose.prod.yml down
 docker volume rm padel-app_padel_postgres_data_prod
-./deploy.sh --with-seed
+./scripts/deploy.sh
+./scripts/seed-prod.sh
 ```
 
 ## Bezpečnost
