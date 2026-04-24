@@ -10,7 +10,12 @@ services:
     container_name: padel-app-prod
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3101:3000"
+      # Bind na docker0 bridge gateway (172.17.0.1), ne loopback hosta (127.0.0.1).
+      # Nginx pivnikonta resolvuje host.docker.internal → 172.17.0.1, odtud se
+      # potřebuje dovolat na port 3101. Bind na 127.0.0.1 byl z Dockeru neviditelný
+      # (Connection refused). 172.17.0.1 je dostupná jen z Docker sítí na hostu,
+      # ne z veřejného netu, takže bezpečnost zůstává.
+      - "172.17.0.1:3101:3000"
     environment:
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: "1"
