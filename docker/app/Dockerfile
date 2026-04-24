@@ -54,6 +54,9 @@ CMD ["node", "server.js"]
 
 # ---------- migrator (jednorázové `prisma migrate deploy` / `db seed`) ----------
 # Má plné node_modules z builderu, takže prisma CLI funguje i s tranzitivními deps.
+# PATH extension je nutná pro `prisma db seed`, který spawnuje `tsx prisma/seed.ts`
+# podle prisma.config.ts — bez /app/node_modules/.bin v PATH to skončí ENOENT.
 FROM builder AS migrator
 ENV NODE_ENV=production
+ENV PATH="/app/node_modules/.bin:$PATH"
 CMD ["node", "node_modules/prisma/build/index.js", "migrate", "deploy"]
